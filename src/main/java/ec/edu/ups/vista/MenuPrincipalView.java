@@ -394,7 +394,7 @@ public class MenuPrincipalView extends JFrame {
         } else {
             System.err.println("Error: No se ha cargado el icono de Producto");
         }
-        URL iconoMenuUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Usuario.svg.png");
+        URL iconoMenuUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Usuario.svg.png.png");
         if (iconoMenuUsuarioURL != null) {
             ImageIcon iconoMenuUsuario = new ImageIcon(iconoMenuUsuarioURL);
             menuUsuario.setIcon(iconoMenuUsuario);
