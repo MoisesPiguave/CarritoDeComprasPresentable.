@@ -1,10 +1,15 @@
 # 🛒 Proyecto de Ejemplo - Carrito de Compras
+# Nombre : Moises Piguave
+Video: https://youtu.be/0kx__BpvYUA
+
+
+Git: https://github.com/MoisesPiguave/CarritoDeComprasDefinitivo  
 
 Este proyecto fue desarrollado como parte del **período 66** de la asignatura **Programación Orientada a Objetos** en la Universidad Politécnica Salesiana.  
 Su objetivo principal es demostrar el uso de **patrones de diseño** aplicados a una aplicación Java con interfaz gráfica construida con **Swing**.
 
 ---
-
+![MoisesPiguave.png](../../Downloads/MoisesPiguave.png)
 ## 🎯 Objetivo del proyecto
 
 Implementar un sistema educativo que simula un **carrito de compras**, utilizando buenas prácticas de diseño y una arquitectura desacoplada basada en **MVC** (Modelo-Vista-Controlador), **DAO** (Data Access Object) y principios de **POO** y **SOLID**.
@@ -23,11 +28,17 @@ Implementar un sistema educativo que simula un **carrito de compras**, utilizand
 ## 🧱 Patrones de Diseño aplicados
 
 - **MVC (Modelo - Vista - Controlador)**  
-  Para separar la lógica de negocio de la interfaz gráfica.
+  Para separar la lógica de negocio de la interfaz gráfica. clases como carrito , item de compras, usuario entro otros dentroo del modelo
+- dentro de controller como carrito , usario controller
+- la vista como el logini view, recuperar, crer usuario y todo lo relacionado al crud del usuario, producto y el carrito
+
+
+
 
 - **DAO (Data Access Object)**  
   Para desacoplar el acceso a los datos, facilitando la migración a diferentes fuentes (archivos, base de datos, etc.).
-
+  como ejemplo tenemos el carrito dao memoria , con la implentacion de los metodos del carrito dao
+- 
 - **SRP y DIP** de los principios **SOLID**  
   Para asegurar una arquitectura mantenible, extensible y fácil de testear.
 
