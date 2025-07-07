@@ -1,4 +1,4 @@
-package ec.edu.ups.vista.AdministracionView;
+package ec.edu.ups.vista.AdministradorView;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
@@ -18,10 +18,10 @@ public class LoginView extends JFrame {
     private JLabel lblUsuario;
     private JLabel lblContraseña;
     private JLabel lblIniciarSesion;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public LoginView( MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public LoginView( MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Iniciar Sesión");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -139,22 +139,22 @@ public class LoginView extends JFrame {
         cbxIdiomas.addItem("Español");
         cbxIdiomas.addItem("English");
         cbxIdiomas.addItem("Français");
-        actualizarTextos(mi);
+        actualizarTextos(idioma);
     }
 
-    public void actualizarTextos(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public void actualizarTextos(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
 
-        lblIniciarSesion.setText(mi.get("login.titulo"));
-        lblUsuario.setText(mi.get("login.usuario"));
-        lblContraseña.setText(mi.get("login.contrasenia"));
+        lblIniciarSesion.setText(idioma.get("login.titulo"));
+        lblUsuario.setText(idioma.get("login.usuario"));
+        lblContraseña.setText(idioma.get("login.contrasenia"));
 
-        btnIniciarSesion.setText(mi.get("login.iniciar"));
-        btnRegistrarse.setText(mi.get("login.registrar"));
-        btnOlvidar.setText(mi.get("login.olvidar"));
-        btnSalir.setText(mi.get("login.salir"));
+        btnIniciarSesion.setText(idioma.get("login.iniciar"));
+        btnRegistrarse.setText(idioma.get("login.registrar"));
+        btnOlvidar.setText(idioma.get("login.olvidar"));
+        btnSalir.setText(idioma.get("login.salir"));
 
-        setTitle(mi.get("login.titulo"));
+        setTitle(idioma.get("login.titulo"));
     }
     private void iconos() {
         URL botonIniciarSesion = LoginView.class.getClassLoader().getResource("imagenes/Login.svg.png");

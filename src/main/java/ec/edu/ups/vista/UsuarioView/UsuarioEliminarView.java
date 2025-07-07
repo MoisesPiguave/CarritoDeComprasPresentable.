@@ -2,7 +2,7 @@ package ec.edu.ups.vista.UsuarioView;
 
 import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,10 +17,10 @@ public class UsuarioEliminarView extends JInternalFrame {
     private JButton BtnBuscar;
     private JLabel lblEliminar;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public UsuarioEliminarView( MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public UsuarioEliminarView( MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Datos del Producto");
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -40,19 +40,19 @@ public class UsuarioEliminarView extends JInternalFrame {
         iconos();
     }
     public void cambiarIdioma() {
-        setTitle(mi.get("usuario.eliminar.titulo"));
-        lblEliminar.setText(mi.get("usuario.eliminar.tituloEtiqueta"));
-        BtnBuscar.setText(mi.get("usuario.eliminar.boton.buscar"));
-        BtnEliminar.setText(mi.get("usuario.eliminar.boton.eliminar"));
+        setTitle(idioma.get("usuario.eliminar.titulo"));
+        lblEliminar.setText(idioma.get("usuario.eliminar.tituloEtiqueta"));
+        BtnBuscar.setText(idioma.get("usuario.eliminar.boton.buscar"));
+        BtnEliminar.setText(idioma.get("usuario.eliminar.boton.eliminar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("usuario.eliminar.columna.nombre"),
-                mi.get("usuario.eliminar.columna.usuario"),
-                mi.get("usuario.eliminar.columna.contrasena"),
-                mi.get("usuario.eliminar.columna.correo"),
-                mi.get("usuario.eliminar.columna.celular"),
-                mi.get("usuario.eliminar.columna.fechaNacimiento"),
-                mi.get("usuario.eliminar.columna.rol")
+                idioma.get("usuario.eliminar.columna.nombre"),
+                idioma.get("usuario.eliminar.columna.usuario"),
+                idioma.get("usuario.eliminar.columna.contrasena"),
+                idioma.get("usuario.eliminar.columna.correo"),
+                idioma.get("usuario.eliminar.columna.celular"),
+                idioma.get("usuario.eliminar.columna.fechaNacimiento"),
+                idioma.get("usuario.eliminar.columna.rol")
         });
     }
 

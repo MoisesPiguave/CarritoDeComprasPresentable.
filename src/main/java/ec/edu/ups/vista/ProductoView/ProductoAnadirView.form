@@ -6,7 +6,7 @@
       <xy x="20" y="20" width="744" height="423"/>
     </constraints>
     <properties>
-      <background color="-16774110"/>
+      <background color="-1566"/>
     </properties>
     <border type="none" title-justification="2">
       <font size="14" style="1"/>
@@ -22,7 +22,7 @@
           <background color="-2760722"/>
           <enabled value="true"/>
           <font name="Consolas"/>
-          <foreground color="-394241"/>
+          <foreground color="-16774110"/>
           <text value="Codigo:"/>
         </properties>
       </component>
@@ -34,7 +34,7 @@
           <background color="-2102791"/>
           <enabled value="true"/>
           <font name="Consolas"/>
-          <foreground color="-657413"/>
+          <foreground color="-16774110"/>
           <text value="Nombre:"/>
         </properties>
       </component>
@@ -46,7 +46,7 @@
           <background color="-1510672"/>
           <enabled value="true"/>
           <font name="Consolas"/>
-          <foreground color="-1445401"/>
+          <foreground color="-16774110"/>
           <text value="Precio:"/>
         </properties>
       </component>
@@ -88,7 +88,9 @@
           </grid>
         </constraints>
         <properties>
+          <background color="-1566"/>
           <font name="Consolas"/>
+          <foreground color="-16774110"/>
           <text value="Aceptar"/>
         </properties>
       </component>
@@ -97,7 +99,9 @@
           <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <background color="-1566"/>
           <font name="Consolas"/>
+          <foreground color="-16774110"/>
           <text value="Limpiar"/>
         </properties>
       </component>
@@ -107,7 +111,7 @@
         </constraints>
         <properties>
           <font name="Consolas"/>
-          <foreground color="-394241"/>
+          <foreground color="-16774110"/>
           <text value="NUEVO PRODUCTO"/>
         </properties>
       </component>

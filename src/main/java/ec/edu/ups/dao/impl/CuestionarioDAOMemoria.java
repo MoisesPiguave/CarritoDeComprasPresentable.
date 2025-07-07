@@ -26,8 +26,11 @@ public class CuestionarioDAOMemoria implements CuestionarioDAO {
         preguntas.add(new Preguntas("4", idioma.get("pregunta.deporte_favorito")));
         preguntas.add(new Preguntas("5", idioma.get("pregunta.nombre_de_tu_mascota")));
         preguntas.add(new Preguntas("6", idioma.get("pregunta.artista_favorito")));
-        preguntas.add(new Preguntas("7", idioma.get("pregunta.Comida_que_no_te_gusta")));
+        preguntas.add(new Preguntas("7", idioma.get("pregunta.comida_que_no_te_gusta")));
+        preguntas.add(new Preguntas("8", idioma.get("pregunta.anime_favorito")));
+        preguntas.add(new Preguntas("9", idioma.get("pregunta.messi_o_ronaldo")));
     }
+
 
     @Override
     public void crear(Preguntas pregunta) {
@@ -40,11 +43,10 @@ public class CuestionarioDAOMemoria implements CuestionarioDAO {
     }
 
     @Override
-    public List<Preguntas> listarPreguntasEnunciado() {
+    public List<Preguntas> listarPreguntass() {
         return preguntas;
     }
 
-    // Método para actualizar el handler de idioma y recargar preguntas
     public void actualizarIdioma(MensajeInternacionalizacionHandler nuevoMi) {
         this.idioma = nuevoMi;
         cargarPreguntas();

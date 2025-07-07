@@ -6,7 +6,7 @@
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
     <properties>
-      <background color="-16774110"/>
+      <background color="-1566"/>
     </properties>
     <border type="none">
       <title-color color="-394241"/>
@@ -18,7 +18,9 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <background color="-16774110"/>
+          <background color="-1566"/>
+          <enabled value="false"/>
+          <foreground color="-16774110"/>
         </properties>
         <border type="none"/>
         <children>
@@ -27,8 +29,9 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <background color="-1566"/>
               <font name="Consolas"/>
-              <foreground color="-394241"/>
+              <foreground color="-16774110"/>
               <text value="Codigo"/>
             </properties>
           </component>
@@ -45,9 +48,9 @@
               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <background color="-16579579"/>
+              <background color="-1566"/>
               <font name="Consolas"/>
-              <foreground color="-394241"/>
+              <foreground color="-16774110"/>
               <text value="Buscar"/>
             </properties>
           </component>
@@ -84,7 +87,8 @@
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <background color="-16774110"/>
+          <background color="-1566"/>
+          <foreground color="-16774110"/>
         </properties>
         <border type="none"/>
         <children>
@@ -94,7 +98,7 @@
             </constraints>
             <properties>
               <font name="Consolas"/>
-              <foreground color="-1448482"/>
+              <foreground color="-16774110"/>
               <text value="Carrito Eliminar"/>
             </properties>
           </component>
@@ -105,9 +109,9 @@
           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <background color="-16579579"/>
+          <background color="-1566"/>
           <font name="Consolas"/>
-          <foreground color="-1448482"/>
+          <foreground color="-16774110"/>
           <text value="Eliminar"/>
         </properties>
       </component>

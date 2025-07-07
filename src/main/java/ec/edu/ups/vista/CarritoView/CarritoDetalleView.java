@@ -21,12 +21,12 @@ public class CarritoDetalleView extends JInternalFrame {
     private JLabel lblTotal;
     private JLabel lblDetalle;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public CarritoDetalleView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public CarritoDetalleView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
-        setTitle(mi.get("carrito.detalle.titulo"));
+        setTitle(idioma.get("carrito.detalle.titulo"));
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
         setClosable(true);
@@ -134,7 +134,7 @@ public class CarritoDetalleView extends JInternalFrame {
         modelo.setRowCount(0);
 
         for (ItemCarrito itemCarrito : carrito.obtenerItems()) {
-            Locale locale = mi.getLocale();
+            Locale locale = idioma.getLocale();
             Producto producto = itemCarrito.getProducto();
             Object[] fila = {
                     producto.getCodigo(),
@@ -147,17 +147,17 @@ public class CarritoDetalleView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("carrito.detalle.titulo"));
-        lblDetalle.setText(mi.get("carrito.detalle.etiqueta"));
-        lblSubtotal.setText(mi.get("carrito.detalle.subtotal"));
-        lblIVA.setText(mi.get("carrito.detalle.iva"));
-        lblTotal.setText(mi.get("carrito.detalle.total"));
+        setTitle(idioma.get("carrito.detalle.titulo"));
+        lblDetalle.setText(idioma.get("carrito.detalle.etiqueta"));
+        lblSubtotal.setText(idioma.get("carrito.detalle.subtotal"));
+        lblIVA.setText(idioma.get("carrito.detalle.iva"));
+        lblTotal.setText(idioma.get("carrito.detalle.total"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("carrito.detalle.columna.codigo"),
-                mi.get("carrito.detalle.columna.nombre"),
-                mi.get("carrito.detalle.columna.precio"),
-                mi.get("carrito.detalle.columna.cantidad")
+                idioma.get("carrito.detalle.columna.codigo"),
+                idioma.get("carrito.detalle.columna.nombre"),
+                idioma.get("carrito.detalle.columna.precio"),
+                idioma.get("carrito.detalle.columna.cantidad")
         });
     }
 }

@@ -3,7 +3,7 @@ package ec.edu.ups.vista.ProductoView;
 import ec.edu.ups.modelo.Producto;
 import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -24,12 +24,12 @@ public class ProductoActualizarView extends JInternalFrame {
     private JLabel lblPrecio;
     private JLabel lblActualizar;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public ProductoActualizarView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public ProductoActualizarView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelActualizar);
-        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
         setSize(500, 500);
         setClosable(true);
         setIconifiable(true);
@@ -43,18 +43,18 @@ public class ProductoActualizarView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("producto.actualizar.titulo"));
-        lblActualizar.setText(mi.get("producto.actualizar.encabezado"));
-        lblCodigo.setText(mi.get("producto.actualizar.etiqueta.codigo"));
-        lblNombre.setText(mi.get("producto.actualizar.etiqueta.nombre"));
-        lblPrecio.setText(mi.get("producto.actualizar.etiqueta.precio"));
-        buscarButton.setText(mi.get("producto.actualizar.boton.buscar"));
-        actualizarButton.setText(mi.get("producto.actualizar.boton.actualizar"));
+        setTitle(idioma.get("producto.actualizar.titulo"));
+        lblActualizar.setText(idioma.get("producto.actualizar.encabezado"));
+        lblCodigo.setText(idioma.get("producto.actualizar.etiqueta.codigo"));
+        lblNombre.setText(idioma.get("producto.actualizar.etiqueta.nombre"));
+        lblPrecio.setText(idioma.get("producto.actualizar.etiqueta.precio"));
+        buscarButton.setText(idioma.get("producto.actualizar.boton.buscar"));
+        actualizarButton.setText(idioma.get("producto.actualizar.boton.actualizar"));
 
         String[] columnas = {
-                mi.get("producto.actualizar.columna.codigo"),
-                mi.get("producto.actualizar.columna.nombre"),
-                mi.get("producto.actualizar.columna.precio")
+                idioma.get("producto.actualizar.columna.codigo"),
+                idioma.get("producto.actualizar.columna.nombre"),
+                idioma.get("producto.actualizar.columna.precio")
         };
         modelo.setColumnIdentifiers(columnas);
     }
@@ -108,7 +108,7 @@ public class ProductoActualizarView extends JInternalFrame {
     }
 
     public void cargarDatos(List<Producto> listaProductos) {
-        Locale locale = mi.getLocale();
+        Locale locale = idioma.getLocale();
         modelo.setNumRows(0);
         for (Producto producto : listaProductos) {
             Object[] fila = {

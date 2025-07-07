@@ -1,7 +1,7 @@
 package ec.edu.ups.vista.UsuarioView;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import java.net.URL;
@@ -27,11 +27,11 @@ public class UsuarioModificarView extends JInternalFrame {
     private JLabel lblUsuario;
     private JLabel lblContraseña;
     private JLabel lblUser;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public UsuarioModificarView( MensajeInternacionalizacionHandler mi) {
+    public UsuarioModificarView( MensajeInternacionalizacionHandler idioma) {
 
-        this.mi = mi;
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Modificar Usuario");
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -47,23 +47,23 @@ public class UsuarioModificarView extends JInternalFrame {
         iconos();
     }
     public void cambiarIdioma() {
-        setTitle(mi.get("usuario.modificar.titulo"));
-        lblUser.setText(mi.get("usuario.modificar.usuario_buscar"));
-        lblActualizar.setText(mi.get("usuario.modificar.actualizar"));
-        lblUsuario.setText(mi.get("usuario.modificar.usuario"));
-        lblContraseña.setText(mi.get("usuario.modificar.contrasena"));
-        lblNombreC.setText(mi.get("usuario.modificar.nombre_completo"));
-        lblCorreo.setText(mi.get("usuario.modificar.correo"));
-        lblCelular.setText(mi.get("usuario.modificar.celular"));
-        lblFechaN.setText(mi.get("usuario.modificar.fecha_nacimiento"));
-        btnBuscar.setText(mi.get("boton.usuario.modificar.buscar"));
-        btnEditar.setText(mi.get("boton.usuario.modificar.editar"));
+        setTitle(idioma.get("usuario.modificar.titulo"));
+        lblUser.setText(idioma.get("usuario.modificar.usuario_buscar"));
+        lblActualizar.setText(idioma.get("usuario.modificar.actualizar"));
+        lblUsuario.setText(idioma.get("usuario.modificar.usuario"));
+        lblContraseña.setText(idioma.get("usuario.modificar.contrasena"));
+        lblNombreC.setText(idioma.get("usuario.modificar.nombre_completo"));
+        lblCorreo.setText(idioma.get("usuario.modificar.correo"));
+        lblCelular.setText(idioma.get("usuario.modificar.celular"));
+        lblFechaN.setText(idioma.get("usuario.modificar.fecha_nacimiento"));
+        btnBuscar.setText(idioma.get("boton.usuario.modificar.buscar"));
+        btnEditar.setText(idioma.get("boton.usuario.modificar.editar"));
 
         // Actualizar ComboBox de meses
         cbxMes.removeAllItems(); // Limpiar meses actuales
 
         for (int i = 1; i <= 12; i++) {
-            cbxMes.addItem(mi.get("mes." + i));
+            cbxMes.addItem(idioma.get("mes." + i));
         }
     }
 
@@ -221,11 +221,11 @@ public class UsuarioModificarView extends JInternalFrame {
     }
 
     public MensajeInternacionalizacionHandler getMi() {
-        return mi;
+        return idioma;
     }
 
-    public void setMi(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public void setMi(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
     }
 
     public JLabel getLblUser() {

@@ -41,7 +41,7 @@ public class CarritoController {
         this.idioma = idioma;
         configurarEventos();
     }
-
+    // creamos el los eventos de los botones
     public void configurarEventos() {
         carritoAnadirView.getBtnAnadir().addActionListener(e -> agregarProductoAlCarrito());
         carritoAnadirView.getBtnGuardar().addActionListener(e -> guardarCarrito());
@@ -58,7 +58,7 @@ public class CarritoController {
         carritoEliminarView.getBtnBuscar().addActionListener(e -> buscarCarritoParaEliminar());
         carritoEliminarView.getBtnEliminar().addActionListener(e -> eliminarCarrito());
     }
-
+    // metodo para eliminar el carrito
     private void eliminarCarrito() {
         String textoCodigo = carritoEliminarView.getTxtCodigo().getText().trim();
 
@@ -73,7 +73,7 @@ public class CarritoController {
         carritoEliminarView.limpiarCampos();
     }
 
-
+    // metodo para buscar el carrito por codigo y poder eliminar
     private void buscarCarritoParaEliminar() {
         String codigo = carritoEliminarView.getTxtCodigo().getText();
         if (!codigo.isEmpty()) {
@@ -92,7 +92,7 @@ public class CarritoController {
             carritoEliminarView.mostrarMensaje(idioma.get("mensaje.codigo.invalido"));
         }
     }
-
+    // metodo para eliminar carrito
     private void modificarCarrito() {
         int filaSeleccionada = carritoModificarView.getTblProductos().getSelectedRow();
         if (filaSeleccionada == -1) {
@@ -136,7 +136,7 @@ public class CarritoController {
         carritoModificarView.getTxtTotal().setText(FormateadorUtils.formatearMoneda(carrito.calcularTotalConIVA(), locale));
         carritoModificarView.mostrarMensaje(idioma.get("mensaje.cantidad.actualizada"));
     }
-
+    // metodo para buscar
     private void buscarCarritoParaModificar() {
         String codigo = carritoModificarView.getTxtCarrito().getText();
         if (!codigo.isEmpty()) {
@@ -160,7 +160,7 @@ public class CarritoController {
             carritoModificarView.mostrarMensaje(idioma.get("mensaje.codigo.invalido"));
         }
     }
-
+// metodo para mostrar detalles del carrito
     private void mostrarDetalle() {
         int filaSeleccionada = carritoListarView.getTblProductos().getSelectedRow();
 
@@ -187,7 +187,6 @@ public class CarritoController {
                 JOptionPane.showMessageDialog(carritoListarView, idioma.get("carrito.no.encontrado"));
             }
         } else {
-            // Mensaje directamente desde la vista de lista si no se selecciona nada
             JOptionPane.showMessageDialog(carritoListarView, idioma.get("mensaje.seleccionar.carrito"));
         }
     }

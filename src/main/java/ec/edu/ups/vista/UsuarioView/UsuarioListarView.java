@@ -1,7 +1,7 @@
 package ec.edu.ups.vista.UsuarioView;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,10 +17,10 @@ public class UsuarioListarView extends JInternalFrame {
     private JLabel lblListar;
     private JLabel lblUser;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public UsuarioListarView( MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public UsuarioListarView( MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Listar Usuarios");
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -40,20 +40,20 @@ public class UsuarioListarView extends JInternalFrame {
         iconos();
     }
     public void cambiarIdioma() {
-        setTitle(mi.get("usuario.listar.titulo"));
-        lblListar.setText(mi.get("usuario.listar.tituloTabla"));
-        lblUser.setText(mi.get("usuario.listar.usuario"));
-        BtnBuscar.setText(mi.get("usuario.listar.boton.buscar"));
-        BtnListar.setText(mi.get("usuario.listar.boton.listar"));
+        setTitle(idioma.get("usuario.listar.titulo"));
+        lblListar.setText(idioma.get("usuario.listar.tituloTabla"));
+        lblUser.setText(idioma.get("usuario.listar.usuario"));
+        BtnBuscar.setText(idioma.get("usuario.listar.boton.buscar"));
+        BtnListar.setText(idioma.get("usuario.listar.boton.listar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("usuario.listar.columna.nombre"),
-                mi.get("usuario.listar.columna.usuario"),
-                mi.get("usuario.listar.columna.contrasena"),
-                mi.get("usuario.listar.columna.correo"),
-                mi.get("usuario.listar.columna.celular"),
-                mi.get("usuario.listar.columna.fechaNacimiento"),
-                mi.get("usuario.listar.columna.rol")
+                idioma.get("usuario.listar.columna.nombre"),
+                idioma.get("usuario.listar.columna.usuario"),
+                idioma.get("usuario.listar.columna.contrasena"),
+                idioma.get("usuario.listar.columna.correo"),
+                idioma.get("usuario.listar.columna.celular"),
+                idioma.get("usuario.listar.columna.fechaNacimiento"),
+                idioma.get("usuario.listar.columna.rol")
         });
     }
 

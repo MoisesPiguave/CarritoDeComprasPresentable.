@@ -158,7 +158,7 @@ public class ProductoController {
         productoEliminarView.mostrarMensaje(idioma.get("producto.eliminado"));
     }
 
-
+    // metodo para buscar el producto por Codigo y luego eliminar
     private void buscarProductoPorCodigoEliminar() {
         String code = productoEliminarView.getTextField1().getText();
         if (!code.isEmpty()) {
@@ -173,7 +173,7 @@ public class ProductoController {
             }
         }
     }
-
+    // metodo para buscar el producto por Codigo y luego actualizar
     private void buscarProductoPorCodigoActualizar() {
         String code = productoActualizarView.getTextField1().getText();
         if (!code.isEmpty()) {
@@ -188,7 +188,7 @@ public class ProductoController {
             }
         }
     }
-
+    // metodo para actualizar el producto
     private void actualizarProducto() {
         String cod = productoActualizarView.getTextField1().getText();
         int codigo = Integer.parseInt(cod);

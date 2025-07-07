@@ -3,7 +3,7 @@ package ec.edu.ups.vista.ProductoView;
 import ec.edu.ups.modelo.Producto;
 import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -20,13 +20,13 @@ public class ProductoEliminarView extends JInternalFrame {
     private JLabel lblCodigo;
     private JLabel lblEliminar;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public ProductoEliminarView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public ProductoEliminarView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelEliminar);
-        setTitle(mi.get("producto.eliminar.titulo"));
-        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        setTitle(idioma.get("producto.eliminar.titulo"));
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
         setSize(500, 500);
         setClosable(true);
         setIconifiable(true);
@@ -34,9 +34,9 @@ public class ProductoEliminarView extends JInternalFrame {
 
         modelo = new DefaultTableModel();
         Object[] columnas = {
-                mi.get("producto.eliminar.columna.codigo"),
-                mi.get("producto.eliminar.columna.nombre"),
-                mi.get("producto.eliminar.columna.precio")
+                idioma.get("producto.eliminar.columna.codigo"),
+                idioma.get("producto.eliminar.columna.nombre"),
+                idioma.get("producto.eliminar.columna.precio")
         };
         modelo.setColumnIdentifiers(columnas);
         table1.setModel(modelo);
@@ -46,19 +46,19 @@ public class ProductoEliminarView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("producto.eliminar.titulo"));
+        setTitle(idioma.get("producto.eliminar.titulo"));
 
-        lblCodigo.setText(mi.get("producto.eliminar.etiqueta.codigo"));
-        lblEliminar.setText(mi.get("producto.eliminar.etiqueta.eliminar"));
+        lblCodigo.setText(idioma.get("producto.eliminar.etiqueta.codigo"));
+        lblEliminar.setText(idioma.get("producto.eliminar.etiqueta.eliminar"));
 
-        buscarButton.setText(mi.get("producto.eliminar.boton.buscar"));
-        eliminarButton.setText(mi.get("producto.eliminar.boton.eliminar"));
+        buscarButton.setText(idioma.get("producto.eliminar.boton.buscar"));
+        eliminarButton.setText(idioma.get("producto.eliminar.boton.eliminar"));
 
         // Actualizar encabezados de tabla
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("producto.eliminar.columna.codigo"),
-                mi.get("producto.eliminar.columna.nombre"),
-                mi.get("producto.eliminar.columna.precio")
+                idioma.get("producto.eliminar.columna.codigo"),
+                idioma.get("producto.eliminar.columna.nombre"),
+                idioma.get("producto.eliminar.columna.precio")
         });
     }
 
@@ -130,7 +130,7 @@ public class ProductoEliminarView extends JInternalFrame {
         modelo.setNumRows(0);
 
         for (Producto producto : listaProductos) {
-            Locale locale = mi.getLocale();
+            Locale locale = idioma.getLocale();
             Object[] fila = {
                     producto.getCodigo(),
                     producto.getNombre(),

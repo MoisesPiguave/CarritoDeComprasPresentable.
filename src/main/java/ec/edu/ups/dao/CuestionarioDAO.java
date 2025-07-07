@@ -7,5 +7,5 @@ import java.util.List;
 public interface CuestionarioDAO {
     void crear(Preguntas preguntas);
     List<Preguntas> listarPreguntas();
-    List<Preguntas> listarPreguntasEnunciado();
+    List<Preguntas> listarPreguntass();
 }

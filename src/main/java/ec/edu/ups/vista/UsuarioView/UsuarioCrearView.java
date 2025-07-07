@@ -2,7 +2,7 @@ package ec.edu.ups.vista.UsuarioView;
 
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -30,10 +30,10 @@ public class UsuarioCrearView extends JInternalFrame {
     private JComboBox cbxMes;
     private JComboBox cbxAño;
     private final Rol rolFijo = Rol.USUARIO;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public UsuarioCrearView ( MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public UsuarioCrearView ( MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Crear Usuario");
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -61,21 +61,21 @@ public class UsuarioCrearView extends JInternalFrame {
         }
     }
     public void cambiarIdioma() {
-        setTitle(mi.get("usuario.crear.titulo"));
-        lblNuevoUsuario.setText(mi.get("usuario.crear.tituloEtiqueta"));
-        lblUsuario.setText(mi.get("usuario.crear.usuario"));
-        lblContraseña.setText(mi.get("usuario.crear.contrasena"));
-        lblRol.setText(mi.get("usuario.crear.rol"));
-        lblCorreo.setText(mi.get("usuario.crear.correo"));
-        lblCelular.setText(mi.get("usuario.crear.celular"));
-        lblNombreC.setText(mi.get("usuario.crear.nombreCompleto"));
-        lblFechaN.setText(mi.get("usuario.crear.fechaNacimiento"));
-        BtnRegistrar.setText(mi.get("usuario.crear.boton.registrar"));
-        BtnLimpiar.setText(mi.get("usuario.crear.boton.limpiar"));
+        setTitle(idioma.get("usuario.crear.titulo"));
+        lblNuevoUsuario.setText(idioma.get("usuario.crear.tituloEtiqueta"));
+        lblUsuario.setText(idioma.get("usuario.crear.usuario"));
+        lblContraseña.setText(idioma.get("usuario.crear.contrasena"));
+        lblRol.setText(idioma.get("usuario.crear.rol"));
+        lblCorreo.setText(idioma.get("usuario.crear.correo"));
+        lblCelular.setText(idioma.get("usuario.crear.celular"));
+        lblNombreC.setText(idioma.get("usuario.crear.nombreCompleto"));
+        lblFechaN.setText(idioma.get("usuario.crear.fechaNacimiento"));
+        BtnRegistrar.setText(idioma.get("usuario.crear.boton.registrar"));
+        BtnLimpiar.setText(idioma.get("usuario.crear.boton.limpiar"));
 
         cbxMes.removeAllItems();
         for (int i = 1; i <= 12; i++) {
-            cbxMes.addItem(mi.get("mess." + i));
+            cbxMes.addItem(idioma.get("mess." + i));
         }
         ;
     }
@@ -237,11 +237,11 @@ public class UsuarioCrearView extends JInternalFrame {
     }
 
     public MensajeInternacionalizacionHandler getMi() {
-        return mi;
+        return idioma;
     }
 
-    public void setMi(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public void setMi(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
     }
 
     public void limpiarCampos() {

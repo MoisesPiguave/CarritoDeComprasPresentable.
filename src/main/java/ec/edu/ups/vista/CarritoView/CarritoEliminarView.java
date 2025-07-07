@@ -5,7 +5,7 @@ import ec.edu.ups.modelo.ItemCarrito;
 import ec.edu.ups.modelo.Producto;
 import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,12 +21,12 @@ public class CarritoEliminarView extends JInternalFrame {
     private JLabel lblCodigo;
     private JLabel lblEliminar;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public CarritoEliminarView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public CarritoEliminarView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
-        setTitle(mi.get("carrito.eliminar.titulo"));
+        setTitle(idioma.get("carrito.eliminar.titulo"));
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
         setClosable(true);
@@ -35,12 +35,12 @@ public class CarritoEliminarView extends JInternalFrame {
 
         modelo = new DefaultTableModel();
         Object[] columnas = {
-                mi.get("carrito.eliminar.columna.codigo"),
-                mi.get("carrito.eliminar.columna.nombre"),
-                mi.get("carrito.eliminar.columna.precio"),
-                mi.get("carrito.eliminar.columna.cantidad"),
-                mi.get("carrito.eliminar.columna.subtotal"),
-                mi.get("carrito.eliminar.columna.total")
+                idioma.get("carrito.eliminar.columna.codigo"),
+                idioma.get("carrito.eliminar.columna.nombre"),
+                idioma.get("carrito.eliminar.columna.precio"),
+                idioma.get("carrito.eliminar.columna.cantidad"),
+                idioma.get("carrito.eliminar.columna.subtotal"),
+                idioma.get("carrito.eliminar.columna.total")
         };
         modelo.setColumnIdentifiers(columnas);
         table1.setModel(modelo);
@@ -50,19 +50,19 @@ public class CarritoEliminarView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("carrito.eliminar.titulo"));
-        lblEliminar.setText(mi.get("carrito.eliminar.etiqueta"));
-        lblCodigo.setText(mi.get("carrito.eliminar.etiqueta.codigo"));
-        btnBuscar.setText(mi.get("carrito.eliminar.boton.buscar"));
-        btnEliminar.setText(mi.get("carrito.eliminar.boton.eliminar"));
+        setTitle(idioma.get("carrito.eliminar.titulo"));
+        lblEliminar.setText(idioma.get("carrito.eliminar.etiqueta"));
+        lblCodigo.setText(idioma.get("carrito.eliminar.etiqueta.codigo"));
+        btnBuscar.setText(idioma.get("carrito.eliminar.boton.buscar"));
+        btnEliminar.setText(idioma.get("carrito.eliminar.boton.eliminar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("carrito.eliminar.columna.codigo"),
-                mi.get("carrito.eliminar.columna.nombre"),
-                mi.get("carrito.eliminar.columna.precio"),
-                mi.get("carrito.eliminar.columna.cantidad"),
-                mi.get("carrito.eliminar.columna.subtotal"),
-                mi.get("carrito.eliminar.columna.total")
+                idioma.get("carrito.eliminar.columna.codigo"),
+                idioma.get("carrito.eliminar.columna.nombre"),
+                idioma.get("carrito.eliminar.columna.precio"),
+                idioma.get("carrito.eliminar.columna.cantidad"),
+                idioma.get("carrito.eliminar.columna.subtotal"),
+                idioma.get("carrito.eliminar.columna.total")
         });
     }
 
@@ -132,7 +132,7 @@ public class CarritoEliminarView extends JInternalFrame {
         modelo.setRowCount(0);
 
         for (ItemCarrito itemCarrito : carrito.obtenerItems()) {
-            Locale locale = mi.getLocale();
+            Locale locale = idioma.getLocale();
             Producto producto = itemCarrito.getProducto();
             Object[] fila = {
                     producto.getCodigo(),

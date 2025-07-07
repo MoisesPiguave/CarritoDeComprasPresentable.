@@ -15,10 +15,10 @@ import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import ec.edu.ups.vista.*;
-import ec.edu.ups.vista.AdministracionView.CuestionarioRecuperarView;
-import ec.edu.ups.vista.AdministracionView.CuestionarioView;
-import ec.edu.ups.vista.AdministracionView.LoginView;
-import ec.edu.ups.vista.AdministracionView.RegistrarView;
+import ec.edu.ups.vista.AdministradorView.CuestionarioRecuperarView;
+import ec.edu.ups.vista.AdministradorView.CuestionarioView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
+import ec.edu.ups.vista.AdministradorView.RegistrarView;
 import ec.edu.ups.vista.CarritoView.CarritoAnadirView;
 import ec.edu.ups.vista.CarritoView.CarritoEliminarView;
 import ec.edu.ups.vista.CarritoView.CarritoListarView;
@@ -38,29 +38,25 @@ import java.awt.event.WindowEvent;
 public class Main {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
-
-            // Internacionalización
             MensajeInternacionalizacionHandler mi = new MensajeInternacionalizacionHandler("es", "EC");
-
-            // DAOs
             ProductoDAO productoDAO = new ProductoDAOMemoria();
             CarritoDAO carritoDAO = new CarritoDAOMemoria();
             CuestionarioDAO cuestionarioDAO = new CuestionarioDAOMemoria(mi);
             UsuarioDAO usuarioDAO = new UsuarioDAOMemoria(cuestionarioDAO);
 
-            // Vistas de login y recuperación
+
             LoginView loginView = new LoginView(mi);
             loginView.setVisible(true);
             CuestionarioView cuestionarioView = new CuestionarioView(mi, cuestionarioDAO);
             CuestionarioRecuperarView cuestionarioRecuperarView = new CuestionarioRecuperarView(mi);
 
-            // Controlador de usuario para login
+
             UsuarioController usuarioController = new UsuarioController(usuarioDAO, loginView, mi, cuestionarioDAO, cuestionarioView, cuestionarioRecuperarView);
 
             loginView.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
-                    Usuario usuarioAutenticado = usuarioController.usuario; // usuario autenticado
+                    Usuario usuarioAutenticado = usuarioController.usuario;
 
                     if (usuarioAutenticado != null) {
                         // Instanciar vistas
@@ -82,7 +78,7 @@ public class Main {
 
                         RegistrarView registrarView = new RegistrarView(mi);
 
-                        // Agregar todos los InternalFrames al jDesktopPane ANTES de mostrarlos
+
                         principalView.getjDesktopPane().add(productoAnadirView);
                         principalView.getjDesktopPane().add(productoListaView);
                         principalView.getjDesktopPane().add(productoActualizarView);
@@ -98,7 +94,7 @@ public class Main {
                         principalView.getjDesktopPane().add(usuarioEliminarView);
                         principalView.getjDesktopPane().add(usuarioModificarView);
 
-                        // Controladores
+
                         ProductoController productoController = new ProductoController(productoDAO, productoAnadirView, productoListaView, carritoAnadirView, productoEliminarView, productoActualizarView, mi);
                         CarritoController carritoController = new CarritoController(carritoDAO, carritoAnadirView, productoDAO, carritoListarView, usuarioAutenticado, carritoModificarView, carritoEliminarView, mi);
                         UsuarioController usuarioController2 = new UsuarioController(usuarioDAO, usuarioCrearView, usuarioListarView, usuarioEliminarView, usuarioModificarView, mi, registrarView);
@@ -110,8 +106,6 @@ public class Main {
                         }
 
                         principalView.setVisible(true);
-
-                        // Listeners para menú: solo mostrar y traer al frente las ventanas ya agregadas
                         principalView.getMenuItemCrearProducto().addActionListener(e1 -> {
                             if (!productoAnadirView.isVisible()) {
                                 productoAnadirView.setVisible(true);

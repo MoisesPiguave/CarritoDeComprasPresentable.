@@ -3,7 +3,7 @@ package ec.edu.ups.vista.CarritoView;
 import ec.edu.ups.modelo.Carrito;
 import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,21 +21,21 @@ public class CarritoListarView extends JInternalFrame {
     private JLabel lblCodigo;
     private JLabel lblListar;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public CarritoListarView(MensajeInternacionalizacionHandler mi) {
-        super(mi.get("carrito.listar.titulo"), true, true, false, true);
-        this.mi = mi;
+    public CarritoListarView(MensajeInternacionalizacionHandler idioma) {
+        super(idioma.get("carrito.listar.titulo"), true, true, false, true);
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
 
         modelo = new DefaultTableModel(new Object[]{
-                mi.get("carrito.listar.columna.codigo"),
-                mi.get("carrito.listar.columna.fecha"),
-                mi.get("carrito.listar.columna.subtotal"),
-                mi.get("carrito.listar.columna.iva"),
-                mi.get("carrito.listar.columna.total")
+                idioma.get("carrito.listar.columna.codigo"),
+                idioma.get("carrito.listar.columna.fecha"),
+                idioma.get("carrito.listar.columna.subtotal"),
+                idioma.get("carrito.listar.columna.iva"),
+                idioma.get("carrito.listar.columna.total")
         }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -49,25 +49,25 @@ public class CarritoListarView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("carrito.listar.titulo"));
-        lblListar.setText(mi.get("carrito.listar.etiqueta"));
-        lblCodigo.setText(mi.get("carrito.listar.codigo"));
-        btnMostrar.setText(mi.get("carrito.listar.boton.mostrar"));
-        btnMostrarDetalle.setText(mi.get("carrito.listar.boton.detalle"));
-        btnListar.setText(mi.get("carrito.listar.boton.listar"));
+        setTitle(idioma.get("carrito.listar.titulo"));
+        lblListar.setText(idioma.get("carrito.listar.etiqueta"));
+        lblCodigo.setText(idioma.get("carrito.listar.codigo"));
+        btnMostrar.setText(idioma.get("carrito.listar.boton.mostrar"));
+        btnMostrarDetalle.setText(idioma.get("carrito.listar.boton.detalle"));
+        btnListar.setText(idioma.get("carrito.listar.boton.listar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("carrito.listar.columna.codigo"),
-                mi.get("carrito.listar.columna.fecha"),
-                mi.get("carrito.listar.columna.subtotal"),
-                mi.get("carrito.listar.columna.iva"),
-                mi.get("carrito.listar.columna.total")
+                idioma.get("carrito.listar.columna.codigo"),
+                idioma.get("carrito.listar.columna.fecha"),
+                idioma.get("carrito.listar.columna.subtotal"),
+                idioma.get("carrito.listar.columna.iva"),
+                idioma.get("carrito.listar.columna.total")
         });
     }
 
     public void cargarDatos(List<Carrito> carritos) {
         modelo.setRowCount(0);
-        Locale locale = mi.getLocale();
+        Locale locale = idioma.getLocale();
         for (Carrito carrito : carritos) {
             String fecha = FormateadorUtils.formatearFecha(carrito.getFechaCreacion().getTime(), locale);
             modelo.addRow(new Object[]{
@@ -162,11 +162,11 @@ public class CarritoListarView extends JInternalFrame {
     }
 
     public MensajeInternacionalizacionHandler getMi() {
-        return mi;
+        return idioma;
     }
 
-    public void setMi(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public void setMi(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
     }
 
     public void iconos() {

@@ -1,4 +1,4 @@
-package ec.edu.ups.vista.AdministracionView;
+package ec.edu.ups.vista.AdministradorView;
 
 import ec.edu.ups.dao.CuestionarioDAO;
 import ec.edu.ups.dao.impl.CuestionarioDAOMemoria;
@@ -16,13 +16,13 @@ public class CuestionarioView extends JFrame {
     private JButton btnTerminar;
     private JLabel lblTitulo;
     private JLabel lblPregunta;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
     private CuestionarioDAO cuestionarioDAO;
     private CuestionarioDAOMemoria cuestionarioDAOMemoria;
 
 
-    public CuestionarioView( MensajeInternacionalizacionHandler mi, CuestionarioDAO cuestionarioDAO) {
-        this.mi = mi;
+    public CuestionarioView( MensajeInternacionalizacionHandler idioma, CuestionarioDAO cuestionarioDAO) {
+        this.idioma = idioma;
         this.cuestionarioDAO = cuestionarioDAO;
         setContentPane(panelPrincipal);
         setTitle("Cuestionario");
@@ -120,13 +120,13 @@ public class CuestionarioView extends JFrame {
             cbxPreguntas.addItem(pregunta);
         }
     }
-    public void actualizarTextos(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
-        setTitle(mi.get("cuestionario.titulo"));
-        lblTitulo.setText(mi.get("cuestionario.titulo"));
-        lblPregunta.setText(mi.get("cuestionario.pregunta"));
-        btnGuardar.setText(mi.get("cuestionario.boton.guardar"));
-        btnTerminar.setText(mi.get("cuestionario.boton.terminar"));
+    public void actualizarTextos(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
+        setTitle(idioma.get("cuestionario.titulo"));
+        lblTitulo.setText(idioma.get("cuestionario.titulo"));
+        lblPregunta.setText(idioma.get("cuestionario.pregunta"));
+        btnGuardar.setText(idioma.get("cuestionario.boton.guardar"));
+        btnTerminar.setText(idioma.get("cuestionario.boton.terminar"));
     }
 
 }

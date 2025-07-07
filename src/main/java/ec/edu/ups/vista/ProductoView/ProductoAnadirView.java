@@ -2,7 +2,7 @@ package ec.edu.ups.vista.ProductoView;
 
 import ec.edu.ups.modelo.Producto;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -22,13 +22,13 @@ public class ProductoAnadirView extends JInternalFrame {
     private JLabel lblNombre;
     private JLabel lblPrecio;
     private JLabel lblNuevoP;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public ProductoAnadirView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public ProductoAnadirView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Datos del Producto");
-        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
         setSize(500, 500);
         setClosable(true);
         setIconifiable(true);
@@ -46,13 +46,13 @@ public class ProductoAnadirView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("producto.anadir.titulo"));
-        lblNuevoP.setText(mi.get("producto.anadir.encabezado"));
-        lblCodigo.setText(mi.get("producto.anadir.etiqueta.codigo"));
-        lblNombre.setText(mi.get("producto.anadir.etiqueta.nombre"));
-        lblPrecio.setText(mi.get("producto.anadir.etiqueta.precio"));
-        btnAceptar.setText(mi.get("producto.anadir.boton.aceptar"));
-        btnLimpiar.setText(mi.get("producto.anadir.boton.limpiar"));
+        setTitle(idioma.get("producto.anadir.titulo"));
+        lblNuevoP.setText(idioma.get("producto.anadir.encabezado"));
+        lblCodigo.setText(idioma.get("producto.anadir.etiqueta.codigo"));
+        lblNombre.setText(idioma.get("producto.anadir.etiqueta.nombre"));
+        lblPrecio.setText(idioma.get("producto.anadir.etiqueta.precio"));
+        btnAceptar.setText(idioma.get("producto.anadir.boton.aceptar"));
+        btnLimpiar.setText(idioma.get("producto.anadir.boton.limpiar"));
     }
 
     public JPanel getPanelPrincipal() {

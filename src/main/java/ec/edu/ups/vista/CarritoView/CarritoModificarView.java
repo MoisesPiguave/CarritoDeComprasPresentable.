@@ -5,7 +5,7 @@ import ec.edu.ups.modelo.ItemCarrito;
 import ec.edu.ups.modelo.Producto;
 import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -31,12 +31,12 @@ public class CarritoModificarView extends JInternalFrame {
     private JPanel lblModificar;
     private JLabel lbl;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public CarritoModificarView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public CarritoModificarView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
-        setTitle(mi.get("carrito.modificar.titulo"));
+        setTitle(idioma.get("carrito.modificar.titulo"));
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
         setClosable(true);
@@ -52,22 +52,22 @@ public class CarritoModificarView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("carrito.modificar.titulo"));
-        lbl.setText(mi.get("carrito.modificar.etiqueta"));
-        lblCodigo.setText(mi.get("carrito.modificar.codigo"));
-        lblCantidad.setText(mi.get("carrito.modificar.cantidad"));
-        lblSubtotal.setText(mi.get("carrito.modificar.subtotal"));
-        lblIVA.setText(mi.get("carrito.modificar.iva"));
-        lblTotal.setText(mi.get("carrito.modificar.total"));
-        btnBuscar.setText(mi.get("boton.buscar"));
-        btnActualizar.setText(mi.get("boton.actualizar"));
-        btnLimpiar.setText(mi.get("boton.limpiar"));
+        setTitle(idioma.get("carrito.modificar.titulo"));
+        lbl.setText(idioma.get("carrito.modificar.etiqueta"));
+        lblCodigo.setText(idioma.get("carrito.modificar.codigo"));
+        lblCantidad.setText(idioma.get("carrito.modificar.cantidad"));
+        lblSubtotal.setText(idioma.get("carrito.modificar.subtotal"));
+        lblIVA.setText(idioma.get("carrito.modificar.iva"));
+        lblTotal.setText(idioma.get("carrito.modificar.total"));
+        btnBuscar.setText(idioma.get("boton.buscar"));
+        btnActualizar.setText(idioma.get("boton.actualizar"));
+        btnLimpiar.setText(idioma.get("boton.limpiar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("carrito.columna.codigo"),
-                mi.get("carrito.columna.nombre"),
-                mi.get("carrito.columna.precio"),
-                mi.get("carrito.columna.cantidad")
+                idioma.get("carrito.columna.codigo"),
+                idioma.get("carrito.columna.nombre"),
+                idioma.get("carrito.columna.precio"),
+                idioma.get("carrito.columna.cantidad")
         });
     }
 
@@ -146,7 +146,7 @@ public class CarritoModificarView extends JInternalFrame {
     }
 
     public void cargarDatos(Carrito carrito) {
-        Locale locale = mi.getLocale();
+        Locale locale = idioma.getLocale();
         modelo.setRowCount(0);
         for (ItemCarrito itemCarrito : carrito.obtenerItems()) {
             Producto producto = itemCarrito.getProducto();

@@ -3,7 +3,7 @@ package ec.edu.ups.vista.ProductoView;
 import ec.edu.ups.modelo.Producto;
 import ec.edu.ups.util.FormateadorUtils;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -18,17 +18,17 @@ public class ProductoListaView extends JInternalFrame {
     private JTable tblProductos;
     private JPanel panelPrincipal;
     private JButton btnListar;
-    private JPanel JPanel;   // Ignoramos este para la internacionalización
+    private JPanel JPanel;
     private JLabel lblLista;
     private JLabel lblNombre;
     private DefaultTableModel modelo;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public ProductoListaView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public ProductoListaView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
-        setTitle(mi.get("producto.lista.titulo"));
-        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        setTitle(idioma.get("producto.lista.titulo"));
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
         setSize(500, 500);
         setClosable(true);
         setIconifiable(true);
@@ -36,9 +36,9 @@ public class ProductoListaView extends JInternalFrame {
 
         modelo = new DefaultTableModel();
         Object[] columnas = {
-                mi.get("producto.lista.columna.codigo"),
-                mi.get("producto.lista.columna.nombre"),
-                mi.get("producto.lista.columna.precio")
+                idioma.get("producto.lista.columna.codigo"),
+                idioma.get("producto.lista.columna.nombre"),
+                idioma.get("producto.lista.columna.precio")
         };
         modelo.setColumnIdentifiers(columnas);
         tblProductos.setModel(modelo);
@@ -48,22 +48,20 @@ public class ProductoListaView extends JInternalFrame {
     }
 
     public void cambiarIdioma() {
-        setTitle(mi.get("producto.lista.titulo"));
+        setTitle(idioma.get("producto.lista.titulo"));
 
-        lblLista.setText(mi.get("producto.lista.etiqueta.lista"));
-        lblNombre.setText(mi.get("producto.lista.etiqueta.nombre"));
+        lblLista.setText(idioma.get("producto.lista.etiqueta.lista"));
+        lblNombre.setText(idioma.get("producto.lista.etiqueta.nombre"));
 
-        btnBuscar.setText(mi.get("producto.lista.boton.buscar"));
-        btnListar.setText(mi.get("producto.lista.boton.listar"));
+        btnBuscar.setText(idioma.get("producto.lista.boton.buscar"));
+        btnListar.setText(idioma.get("producto.lista.boton.listar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                mi.get("producto.lista.columna.codigo"),
-                mi.get("producto.lista.columna.nombre"),
-                mi.get("producto.lista.columna.precio")
+                idioma.get("producto.lista.columna.codigo"),
+                idioma.get("producto.lista.columna.nombre"),
+                idioma.get("producto.lista.columna.precio")
         });
     }
-
-    // Getters y setters
 
     public JTextField getTxtBuscar() {
         return txtBuscar;
@@ -133,7 +131,7 @@ public class ProductoListaView extends JInternalFrame {
         modelo.setNumRows(0);
 
         for (Producto producto : listaProductos) {
-            Locale locale = mi.getLocale();
+            Locale locale = idioma.getLocale();
             Object[] fila = {
                     producto.getCodigo(),
                     producto.getNombre(),

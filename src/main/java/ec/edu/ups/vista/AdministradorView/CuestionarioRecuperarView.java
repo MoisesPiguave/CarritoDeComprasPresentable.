@@ -1,4 +1,4 @@
-package ec.edu.ups.vista.AdministracionView;
+package ec.edu.ups.vista.AdministradorView;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
@@ -17,10 +17,10 @@ public class CuestionarioRecuperarView extends JFrame {
     private JTextField txtUsuario;
     private JButton btnBuscar;
     private JLabel lblUsuario;
-    private final MensajeInternacionalizacionHandler mi;
+    private final MensajeInternacionalizacionHandler idioma;
 
-    public CuestionarioRecuperarView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public CuestionarioRecuperarView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Recuperar Contraseña");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -28,21 +28,17 @@ public class CuestionarioRecuperarView extends JFrame {
         setLocationRelativeTo(null);
         icono();
     }
-    public void actualizarTextos(MensajeInternacionalizacionHandler mi) {
-        // Actualizamos la referencia al manejador de mensajes
-        // (aunque ya es final, por consistencia puedes hacerlo)
-        // this.mi = mi; // no se puede porque es final, pero no es necesario cambiarlo
+    public void actualizarTextos(MensajeInternacionalizacionHandler idioma) {
+        setTitle(idioma.get("recuperar.titulo"));
 
-        setTitle(mi.get("recuperar.titulo"));  // Título ventana
+        lblTitulo.setText(idioma.get("recuperar.titulo"));
+        lblUsuario.setText(idioma.get("recuperar.usuario"));
+        lblPregunta1.setText(idioma.get("recuperar.pregunta"));
+        lblRespuesta.setText(idioma.get("recuperar.respuesta"));
 
-        lblTitulo.setText(mi.get("recuperar.titulo"));
-        lblUsuario.setText(mi.get("recuperar.usuario"));
-        lblPregunta1.setText(mi.get("recuperar.pregunta"));
-        lblRespuesta.setText(mi.get("recuperar.respuesta"));
-
-        btnBuscar.setText(mi.get("recuperar.boton.buscar"));
-        btnEnviar.setText(mi.get("recuperar.boton.enviar"));
-        terminarButton.setText(mi.get("recuperar.boton.terminar"));
+        btnBuscar.setText(idioma.get("recuperar.boton.buscar"));
+        btnEnviar.setText(idioma.get("recuperar.boton.enviar"));
+        terminarButton.setText(idioma.get("recuperar.boton.terminar"));
     }
 
     public JButton getBtnEnviar() {
@@ -86,7 +82,7 @@ public class CuestionarioRecuperarView extends JFrame {
     }
 
     public MensajeInternacionalizacionHandler getMi() {
-        return mi;
+        return idioma;
     }
 
     public void setLblTitulo(JLabel lblTitulo) {

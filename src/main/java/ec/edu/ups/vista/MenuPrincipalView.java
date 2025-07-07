@@ -1,7 +1,6 @@
 package ec.edu.ups.vista;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministracionView.LoginView;
 
 import javax.swing.*;
 import java.net.URL;
@@ -40,10 +39,10 @@ public class MenuPrincipalView extends JFrame {
 
 
     private MiJdesktopPane jDesktopPane;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public MenuPrincipalView( MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public MenuPrincipalView( MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
 
         jDesktopPane = new MiJdesktopPane();
         menuBar = new JMenuBar();
@@ -320,44 +319,32 @@ public class MenuPrincipalView extends JFrame {
     }
 
     public void cambiarIdioma() {
-        if (mi == null) return;
+        if (idioma == null) return;
 
-        // Menús principales
-        menuProducto.setText(mi.get("menu.producto"));
-        menuCarrito.setText(mi.get("menu.carrito"));
-        menuUsuario.setText(mi.get("menu.usuario"));
-        menuIdioma.setText(mi.get("menu.idioma"));
-        menuSalir.setText(mi.get("menu.salir"));
+        menuProducto.setText(idioma.get("menu.producto"));
+        menuCarrito.setText(idioma.get("menu.carrito"));
+        menuUsuario.setText(idioma.get("menu.usuario"));
+        menuIdioma.setText(idioma.get("menu.idioma"));
+        menuSalir.setText(idioma.get("menu.salir"));
+        menuItemCrearProducto.setText(idioma.get("menu.producto.crear"));
+        menuItemEliminarProducto.setText(idioma.get("menu.producto.eliminar"));
+        menuItemActualizarProducto.setText(idioma.get("menu.producto.actualizar"));
+        menuItemBuscarProducto.setText(idioma.get("menu.producto.buscar"));
+        menuItemCrearCarrito.setText(idioma.get("menu.carrito.crear"));
+        menuItemBuscarCarrito.setText(idioma.get("menu.carrito.buscar"));
+        menuItemModificarCarrito.setText(idioma.get("menu.carrito.actualizar"));
+        menuItemEliminarCarrito.setText(idioma.get("menu.carrito.eliminar"));
+        menuItemCrearUsuario.setText(idioma.get("menu.usuario.crear"));
+        menuItemListarUsuario.setText(idioma.get("menu.usuario.buscar"));
+        menuItemActualizarUsuario.setText(idioma.get("menu.usuario.actualizar"));
+        menuItemEliminarUsuario.setText(idioma.get("menu.usuario.eliminar"));
+        menuItemEspanol.setText(idioma.get("Español"));
+        menuItemIngles.setText(idioma.get("Inglés"));
+        menuItemFrances.setText(idioma.get("Frances"));
+        menuItemCerrarSesion.setText(idioma.get("menu.salir.cerrar"));
+        menuItemSalir.setText(idioma.get("menu.salir.salir"));
 
-        // Items de Producto
-        menuItemCrearProducto.setText(mi.get("menu.producto.crear"));
-        menuItemEliminarProducto.setText(mi.get("menu.producto.eliminar"));
-        menuItemActualizarProducto.setText(mi.get("menu.producto.actualizar"));
-        menuItemBuscarProducto.setText(mi.get("menu.producto.buscar"));
-
-        // Items de Carrito
-        menuItemCrearCarrito.setText(mi.get("menu.carrito.crear"));
-        menuItemBuscarCarrito.setText(mi.get("menu.carrito.buscar"));
-        menuItemModificarCarrito.setText(mi.get("menu.carrito.actualizar"));
-        menuItemEliminarCarrito.setText(mi.get("menu.carrito.eliminar"));
-
-        // Items de Usuario
-        menuItemCrearUsuario.setText(mi.get("menu.usuario.crear"));
-        menuItemListarUsuario.setText(mi.get("menu.usuario.buscar"));
-        menuItemActualizarUsuario.setText(mi.get("menu.usuario.actualizar"));
-        menuItemEliminarUsuario.setText(mi.get("menu.usuario.eliminar"));
-
-        // Idiomas
-        menuItemEspanol.setText(mi.get("Español"));
-        menuItemIngles.setText(mi.get("Inglés"));
-        menuItemFrances.setText(mi.get("Frances"));
-
-        // Salir
-        menuItemCerrarSesion.setText(mi.get("menu.salir.cerrar"));
-        menuItemSalir.setText(mi.get("menu.salir.salir"));
-
-        // Título
-        setTitle(mi.get("titulo.ventana"));
+        setTitle(idioma.get("titulo.ventana"));
 
         URL EcuadorURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Ecuador.svg.png");
         if (EcuadorURL != null) {

@@ -1,4 +1,4 @@
-package ec.edu.ups.vista.AdministracionView;
+package ec.edu.ups.vista.AdministradorView;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
@@ -24,10 +24,10 @@ public class RegistrarView extends JFrame {
     private JComboBox cbxDia;
     private JComboBox cbxMes;
     private JComboBox cbxAño;
-    private MensajeInternacionalizacionHandler mi;
+    private MensajeInternacionalizacionHandler idioma;
 
-    public RegistrarView(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
+    public RegistrarView(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
         setContentPane(panelPrincipal);
         setTitle("Recuperar Contraseña");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -38,30 +38,30 @@ public class RegistrarView extends JFrame {
         for (int i = 1980; i <= 2025; i++) cbxAño.addItem(i);
 
         icono();
-        cambiarIdioma(mi);
+        cambiarIdioma(idioma);
 
 
     }
 
-    public void cambiarIdioma(MensajeInternacionalizacionHandler mi) {
-        this.mi = mi;
-        lblRegistrar.setText(mi.get("registrar.titulo"));
-        lblNombreCompleto.setText(mi.get("registrar.nombre"));
-        lblUsuario.setText(mi.get("registrar.usuario"));
-        lblContraseña.setText(mi.get("registrar.contrasena"));
-        lblCelular.setText(mi.get("registrar.celular"));
-        lblCorreo.setText(mi.get("registrar.correo"));
-        lblFechaDeNacimiento.setText(mi.get("registrar.fechaNacimiento"));
+    public void cambiarIdioma(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma;
+        lblRegistrar.setText(idioma.get("registrar.titulo"));
+        lblNombreCompleto.setText(idioma.get("registrar.nombre"));
+        lblUsuario.setText(idioma.get("registrar.usuario"));
+        lblContraseña.setText(idioma.get("registrar.contrasena"));
+        lblCelular.setText(idioma.get("registrar.celular"));
+        lblCorreo.setText(idioma.get("registrar.correo"));
+        lblFechaDeNacimiento.setText(idioma.get("registrar.fechaNacimiento"));
 
-        btnRegistrar.setText(mi.get("registrar.boton.registrar"));
-        btnLimpiar.setText(mi.get("registrar.boton.limpiar"));
+        btnRegistrar.setText(idioma.get("registrar.boton.registrar"));
+        btnLimpiar.setText(idioma.get("registrar.boton.limpiar"));
 
-        cbxMes.removeAllItems(); // Limpiar meses actuales
+        cbxMes.removeAllItems();
         String[] meses = {
-                mi.get("mes.enero"), mi.get("mes.febrero"), mi.get("mes.marzo"),
-                mi.get("mes.abril"), mi.get("mes.mayo"), mi.get("mes.junio"),
-                mi.get("mes.julio"), mi.get("mes.agosto"), mi.get("mes.septiembre"),
-                mi.get("mes.octubre"), mi.get("mes.noviembre"), mi.get("mes.diciembre")
+                idioma.get("mes.enero"), idioma.get("mes.febrero"), idioma.get("mes.marzo"),
+                idioma.get("mes.abril"), idioma.get("mes.mayo"), idioma.get("mes.junio"),
+                idioma.get("mes.julio"), idioma.get("mes.agosto"), idioma.get("mes.septiembre"),
+                idioma.get("mes.octubre"), idioma.get("mes.noviembre"), idioma.get("mes.diciembre")
         };
         for (String mes : meses) {
             cbxMes.addItem(mes);
