@@ -15,6 +15,16 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Controlador para la gestión de productos.
+ * Se encarga de la interacción entre las vistas de producto (añadir, listar, modificar, eliminar)
+ * y el modelo de datos (Producto) a través de su DAO.
+ * Implementa la lógica de negocio para la manipulación de productos.
+ *
+ * @author Moises Piguave
+ * @version 1.0
+ * @since 17 de 7 de 2025
+ */
 public class ProductoController {
 
     private final ProductoAnadirView productoAnadirView;
@@ -25,6 +35,18 @@ public class ProductoController {
     private final ProductoDAO productoDAO;
     private final MensajeInternacionalizacionHandler idioma;
 
+    /**
+     * Constructor del controlador de productos.
+     * Inicializa los DAOs, las vistas y configura los oyentes de eventos.
+     *
+     * @param productoDAO La interfaz de acceso a datos para productos.
+     * @param productoAnadirView La vista para añadir productos.
+     * @param productoListaView La vista para listar productos.
+     * @param carritoAnadirView La vista para añadir productos al carrito (para buscar productos).
+     * @param productoEliminarView La vista para eliminar productos.
+     * @param productoActualizarView La vista para actualizar productos.
+     * @param idioma El manejador para los mensajes de internacionalización.
+     */
     public ProductoController(ProductoDAO productoDAO,
                               ProductoAnadirView productoAnadirView,
                               ProductoListaView productoListaView,
@@ -43,6 +65,10 @@ public class ProductoController {
         this.configurarEventosEnVistas();
     }
 
+    /**
+     * Configura los ActionListeners para los botones de todas las vistas de producto.
+     * Asocia las acciones de los botones con los métodos correspondientes en el controlador.
+     */
     private void configurarEventosEnVistas() {
         productoAnadirView.getBtnAceptar().addActionListener(new ActionListener() {
             @Override
@@ -101,6 +127,9 @@ public class ProductoController {
         });
     }
 
+    /**
+     * Guarda un nuevo producto en la base de datos obteniendo los datos de la vista de añadir producto.
+     */
     private void guardarProducto() {
         int codigo = Integer.parseInt(productoAnadirView.getTxtCodigo().getText());
         String nombre = productoAnadirView.getTxtNombre().getText();
@@ -112,6 +141,9 @@ public class ProductoController {
         productoAnadirView.mostrarProductos(productoDAO.listarTodos());
     }
 
+    /**
+     * Busca productos por nombre y carga los resultados en la vista de lista.
+     */
     private void buscarProducto() {
         String nombre = productoListaView.getTxtBuscar().getText();
 
@@ -119,11 +151,18 @@ public class ProductoController {
         productoListaView.cargarDatos(productosEncontrados);
     }
 
+    /**
+     * Lista todos los productos disponibles y los carga en la vista de lista.
+     */
     private void listarProductos() {
         List<Producto> productos = productoDAO.listarTodos();
         productoListaView.cargarDatos(productos);
     }
 
+    /**
+     * Busca un producto por su código y muestra su información en la vista de añadir al carrito.
+     * Formatea el precio a moneda usando la configuración de internacionalización.
+     */
     private void buscarProductoPorCodigo() {
         Locale locale = idioma.getLocale();
         int codigo = Integer.parseInt(carritoAnadirView.getTxtCodigo().getText());
@@ -138,6 +177,10 @@ public class ProductoController {
         }
     }
 
+    /**
+     * Elimina un producto de la base de datos basado en el código ingresado en la vista de eliminación.
+     * Valida la entrada del código antes de proceder.
+     */
     private void eliminarProducto() {
         String cod = productoEliminarView.getTextField1().getText().trim();
 
@@ -158,7 +201,10 @@ public class ProductoController {
         productoEliminarView.mostrarMensaje(idioma.get("producto.eliminado"));
     }
 
-    // metodo para buscar el producto por Codigo y luego eliminar
+    /**
+     * Busca un producto por su código para mostrarlo en la vista de eliminación.
+     * Si el producto es encontrado, lo carga en la tabla de la vista.
+     */
     private void buscarProductoPorCodigoEliminar() {
         String code = productoEliminarView.getTextField1().getText();
         if (!code.isEmpty()) {
@@ -173,7 +219,11 @@ public class ProductoController {
             }
         }
     }
-    // metodo para buscar el producto por Codigo y luego actualizar
+
+    /**
+     * Busca un producto por su código para mostrarlo en la vista de actualización.
+     * Si el producto es encontrado, lo carga en la tabla y campos de la vista.
+     */
     private void buscarProductoPorCodigoActualizar() {
         String code = productoActualizarView.getTextField1().getText();
         if (!code.isEmpty()) {
@@ -188,7 +238,10 @@ public class ProductoController {
             }
         }
     }
-    // metodo para actualizar el producto
+
+    /**
+     * Actualiza un producto existente en la base de datos con los nuevos datos de la vista de actualización.
+     */
     private void actualizarProducto() {
         String cod = productoActualizarView.getTextField1().getText();
         int codigo = Integer.parseInt(cod);
