@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,48 +32,31 @@ public class CuestionarioDAOArchivo implements CuestionarioDAO {
     private List<Preguntas> preguntas;
     private MensajeInternacionalizacionHandler idioma;
 
-    // Nombre de archivo fijo para las preguntas, ya que son un conjunto único
     private static final String PREGUNTAS_BIN_FILENAME = "preguntas.dat";
+    private static final String PREGUNTAS_TXT_FILENAME = "preguntas.txt";
 
-    /**
-     * Constructor de la clase CuestionarioDAOArchivo.
-     * Inicializa el directorio de almacenamiento y carga las preguntas existentes o las crea por defecto.
-     *
-     * @param directoryPath La ruta base del directorio donde se almacenarán los archivos de cuestionarios.
-     * @param idioma El manejador de internacionalización de mensajes para cargar las preguntas por defecto.
-     */
     public CuestionarioDAOArchivo(String directoryPath, MensajeInternacionalizacionHandler idioma) {
         this.idioma = idioma;
         this.preguntas = new ArrayList<>();
-        // Creamos una subcarpeta 'cuestionarios' dentro del directorio seleccionado por el usuario
         this.storageDirectoryPath = directoryPath + File.separator + "cuestionarios";
         File directory = new File(this.storageDirectoryPath);
         if (!directory.exists()) {
-            if (!directory.mkdirs()) { // Crea el directorio si no existe
+            if (!directory.mkdirs()) {
                 System.err.println("Error al crear el directorio de almacenamiento de cuestionarios: " + storageDirectoryPath);
             }
         }
 
-        cargarPreguntasDesdeArchivo(); // Intentar cargar preguntas al iniciar
-        if (this.preguntas.isEmpty()) { // Si no se cargaron, crearlas por defecto
+        cargarPreguntasDesdeArchivo();
+        if (this.preguntas.isEmpty()) {
             cargarPreguntasPorDefecto();
-            guardarPreguntasEnArchivo(); // Guardar las preguntas por defecto
+            guardarPreguntasEnArchivo();
         }
     }
 
-    /**
-     * Construye el objeto {@link File} para el archivo binario donde se guardan las preguntas.
-     *
-     * @return El objeto {@link File} que representa el archivo binario (.dat) de preguntas.
-     */
     private File getBinaryFile() {
         return new File(storageDirectoryPath + File.separator + PREGUNTAS_BIN_FILENAME);
     }
 
-    /**
-     * Carga un conjunto de preguntas predefinidas en la lista de preguntas en memoria.
-     * Este método se utiliza cuando no se encuentran preguntas persistidas al inicio.
-     */
     private void cargarPreguntasPorDefecto() {
         preguntas.clear();
         preguntas.add(new Preguntas("1", idioma.get("pregunta.color_favorito")));
@@ -86,22 +70,29 @@ public class CuestionarioDAOArchivo implements CuestionarioDAO {
         preguntas.add(new Preguntas("9", idioma.get("pregunta.messi_o_ronaldo")));
     }
 
-    /**
-     * Guarda la lista actual de preguntas en el sistema de archivos utilizando serialización binaria.
-     */
     private void guardarPreguntasEnArchivo() {
         File binaryFile = getBinaryFile();
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binaryFile))) {
             oos.writeObject(new ArrayList<>(preguntas));
             System.out.println("Preguntas guardadas en archivo BINARIO.");
+            guardarPreguntasEnTexto();
         } catch (IOException e) {
             System.err.println("Error al guardar preguntas en archivo BINARIO: " + e.getMessage());
         }
     }
 
-    /**
-     * Carga la lista de preguntas desde el sistema de archivos, priorizando el archivo binario.
-     */
+    private void guardarPreguntasEnTexto() {
+        File textFile = new File(storageDirectoryPath + File.separator + PREGUNTAS_TXT_FILENAME);
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(textFile))) {
+            for (Preguntas pregunta : preguntas) {
+                writer.println(pregunta.getCodigo() + " - " + pregunta.getPreguntas());
+            }
+            System.out.println("Preguntas también guardadas en archivo de TEXTO.");
+        } catch (IOException e) {
+            System.err.println("Error al guardar preguntas en archivo de TEXTO: " + e.getMessage());
+        }
+    }
+
     private void cargarPreguntasDesdeArchivo() {
         File binaryFile = getBinaryFile();
         if (binaryFile.exists()) {
@@ -110,17 +101,10 @@ public class CuestionarioDAOArchivo implements CuestionarioDAO {
                 System.out.println("Preguntas cargadas desde archivo BINARIO.");
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Error al cargar preguntas desde archivo BINARIO: " + e.getMessage());
-                // Si falla la lectura binaria, la lista de preguntas quedará vacía y se cargarán por defecto.
             }
         }
     }
 
-    /**
-     * Crea y persiste una nueva pregunta en la lista en memoria y en el archivo.
-     *
-     * @param pregunta El objeto {@link Preguntas} a ser creado y persistido.
-     * @throws IllegalArgumentException Si la pregunta o su código son nulos o vacíos.
-     */
     @Override
     public void crear(Preguntas pregunta) {
         if (pregunta == null || pregunta.getCodigo() == null || pregunta.getCodigo().isEmpty()) {
@@ -144,36 +128,16 @@ public class CuestionarioDAOArchivo implements CuestionarioDAO {
         }
     }
 
-    /**
-     * Lista todas las preguntas actualmente cargadas en memoria.
-     * Retorna una **copia** de la lista para evitar modificaciones externas directas a la lista interna.
-     *
-     * @return Una {@link List} que contiene todos los objetos {@link Preguntas}.
-     */
     @Override
     public List<Preguntas> listarPreguntas() {
         return new ArrayList<>(preguntas);
     }
 
-    /**
-     * Lista todas las preguntas actualmente cargadas en memoria.
-     * Este método es funcionalmente idéntico a {@link #listarPreguntas()} y podría
-     * considerarse redundante en un diseño más simplificado.
-     * Retorna una **copia** de la lista para evitar modificaciones externas directas a la lista interna.
-     *
-     * @return Una {@link List} que contiene todos los objetos {@link Preguntas}.
-     */
     @Override
     public List<Preguntas> listarPreguntass() {
         return new ArrayList<>(preguntas);
     }
 
-    /**
-     * Actualiza el manejador de internacionalización y recarga las preguntas por defecto
-     * con los textos en el nuevo idioma, persistiendo estos cambios en los archivos.
-     *
-     * @param nuevoMi El nuevo {@link MensajeInternacionalizacionHandler} a utilizar.
-     */
     public void actualizarIdioma(MensajeInternacionalizacionHandler nuevoMi) {
         this.idioma = nuevoMi;
         cargarPreguntasPorDefecto();
