@@ -57,7 +57,7 @@ public class UsuarioListarView extends JInternalFrame {
             }
         };
         tblUsuario.setModel(modelo);
-        cambiarIdioma();
+        cambiarIdioma(idioma);
         iconos();
     }
 
@@ -66,21 +66,21 @@ public class UsuarioListarView extends JInternalFrame {
      * gestionado por el {@link MensajeInternacionalizacionHandler}.
      * Esto incluye el título de la ventana, etiquetas, textos de botones y los encabezados de la tabla.
      */
-    public void cambiarIdioma() {
-        setTitle(idioma.get("usuario.listar.titulo"));
-        lblListar.setText(idioma.get("usuario.listar.tituloTabla"));
-        lblUser.setText(idioma.get("usuario.listar.usuario"));
-        BtnBuscar.setText(idioma.get("usuario.listar.boton.buscar"));
-        BtnListar.setText(idioma.get("usuario.listar.boton.listar"));
+    public void cambiarIdioma(MensajeInternacionalizacionHandler idioma) {
+        setTitle(this.idioma.get("usuario.listar.titulo"));
+        lblListar.setText(this.idioma.get("usuario.listar.tituloTabla"));
+        lblUser.setText(this.idioma.get("usuario.listar.usuario"));
+        BtnBuscar.setText(this.idioma.get("usuario.listar.boton.buscar"));
+        BtnListar.setText(this.idioma.get("usuario.listar.boton.listar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                idioma.get("usuario.listar.columna.nombre"),
-                idioma.get("usuario.listar.columna.usuario"),
-                idioma.get("usuario.listar.columna.contrasena"),
-                idioma.get("usuario.listar.columna.correo"),
-                idioma.get("usuario.listar.columna.celular"),
-                idioma.get("usuario.listar.columna.fechaNacimiento"),
-                idioma.get("usuario.listar.columna.rol")
+                this.idioma.get("usuario.listar.columna.nombre"),
+                this.idioma.get("usuario.listar.columna.usuario"),
+                this.idioma.get("usuario.listar.columna.contrasena"),
+                this.idioma.get("usuario.listar.columna.correo"),
+                this.idioma.get("usuario.listar.columna.celular"),
+                this.idioma.get("usuario.listar.columna.fechaNacimiento"),
+                this.idioma.get("usuario.listar.columna.rol")
         });
     }
 

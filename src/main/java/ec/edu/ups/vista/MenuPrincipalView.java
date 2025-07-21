@@ -46,7 +46,8 @@ public class MenuPrincipalView extends JFrame {
     private JMenuItem menuItemCerrarSesion;
     private JMenuItem menuItemSalir;
 
-    private MiJdesktopPane jDesktopPane;
+    // CAMBIO CLAVE AQUÍ: Usamos JDesktopPane estándar
+    private JDesktopPane jDesktopPane;
     private MensajeInternacionalizacionHandler idioma;
 
     /**
@@ -60,7 +61,8 @@ public class MenuPrincipalView extends JFrame {
     public MenuPrincipalView( MensajeInternacionalizacionHandler idioma) {
         this.idioma = idioma;
 
-        jDesktopPane = new MiJdesktopPane();
+        // CAMBIO CLAVE AQUÍ: Inicializamos con el JDesktopPane estándar
+        jDesktopPane = new JDesktopPane();
         menuBar = new JMenuBar();
 
         menuProducto = new JMenu("Producto");
@@ -122,7 +124,7 @@ public class MenuPrincipalView extends JFrame {
         setJMenuBar(menuBar);
         setContentPane(jDesktopPane);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Sistema de Carrito de Compras En Línea"); // Este título se actualizará en cambiarIdioma()
+        setTitle("Sistema de Carrito de Compras En Línea");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
 
@@ -245,6 +247,7 @@ public class MenuPrincipalView extends JFrame {
      * Obtiene el JDesktopPane donde se mostrarán las ventanas internas.
      * @return El {@link JDesktopPane}.
      */
+    // ELIMINA LA LÍNEA DE ABAJO: @Override
     public JDesktopPane getjDesktopPane() {
         return jDesktopPane;
     }
@@ -557,160 +560,163 @@ public class MenuPrincipalView extends JFrame {
 
         setTitle(idioma.get("titulo.ventana"));
 
-        // Carga y asignación de iconos
-        URL EcuadorURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Ecuador.svg.png");
+        // Carga y asignación de iconos (asegúrate de que las rutas de las imágenes son correctas)
+        // He añadido una comprobación para evitar NullPointerException si getResource devuelve null
+        // y mensajes de error más específicos.
+
+        URL EcuadorURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Ecuador.svg.png");
         if (EcuadorURL != null) {
-            ImageIcon iconoMenuItemEspañol = new ImageIcon(EcuadorURL);
-            menuItemEspanol.setIcon(iconoMenuItemEspañol);
+            ImageIcon icono = new ImageIcon(EcuadorURL);
+            menuItemEspanol.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Ecuador"); // Mensaje de error más específico
+            System.err.println("Error: No se ha cargado el icono de Ecuador (imagenes/Ecuador.svg.png)");
         }
-        URL USAURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/EstadosUnidos.svg.png");
+        URL USAURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/EstadosUnidos.svg.png");
         if (USAURL != null) {
-            ImageIcon iconoMenuItemIngles = new ImageIcon(USAURL);
-            menuItemIngles.setIcon(iconoMenuItemIngles);
+            ImageIcon icono = new ImageIcon(USAURL);
+            menuItemIngles.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Estados Unidos");
+            System.err.println("Error: No se ha cargado el icono de Estados Unidos (imagenes/EstadosUnidos.svg.png)");
         }
-        URL FranceURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Francia.svg.png");
+        URL FranceURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Francia.svg.png");
         if (FranceURL != null) {
-            ImageIcon iconoMenuItemFrances = new ImageIcon(FranceURL);
-            menuItemFrances.setIcon(iconoMenuItemFrances);
+            ImageIcon icono = new ImageIcon(FranceURL);
+            menuItemFrances.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Francia");
+            System.err.println("Error: No se ha cargado el icono de Francia (imagenes/Francia.svg.png)");
         }
-        URL iconoMenuCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Carrito.svg.png");
+        URL iconoMenuCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Carrito.svg.png");
         if (iconoMenuCarritoURL != null) {
-            ImageIcon iconoMenuCarrito = new ImageIcon(iconoMenuCarritoURL);
-            menuCarrito.setIcon(iconoMenuCarrito);
+            ImageIcon icono = new ImageIcon(iconoMenuCarritoURL);
+            menuCarrito.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Carrito");
+            System.err.println("Error: No se ha cargado el icono de Carrito (imagenes/Carrito.svg.png)");
         }
-        URL iconoMenuProductoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Producto.svg.png");
+        URL iconoMenuProductoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Producto.svg.png");
         if (iconoMenuProductoURL != null) {
-            ImageIcon iconoMenuProducto = new ImageIcon(iconoMenuProductoURL);
-            menuProducto.setIcon(iconoMenuProducto);
+            ImageIcon icono = new ImageIcon(iconoMenuProductoURL);
+            menuProducto.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Producto");
+            System.err.println("Error: No se ha cargado el icono de Producto (imagenes/Producto.svg.png)");
         }
-        URL iconoMenuUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Usuario.svg.png.png");
+        URL iconoMenuUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Usuario.svg.png.png"); // Nota: doble .png aquí
         if (iconoMenuUsuarioURL != null) {
-            ImageIcon iconoMenuUsuario = new ImageIcon(iconoMenuUsuarioURL);
-            menuUsuario.setIcon(iconoMenuUsuario);
+            ImageIcon icono = new ImageIcon(iconoMenuUsuarioURL);
+            menuUsuario.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Usuario");
+            System.err.println("Error: No se ha cargado el icono de Usuario (imagenes/Usuario.svg.png.png)");
         }
-        URL iconoMenuSalirURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Salir.svg.png");
+        URL iconoMenuSalirURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Salir.svg.png");
         if (iconoMenuSalirURL != null) {
-            ImageIcon iconoMenuSalir = new ImageIcon(iconoMenuSalirURL);
-            menuSalir.setIcon(iconoMenuSalir);
+            ImageIcon icono = new ImageIcon(iconoMenuSalirURL);
+            menuSalir.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Salir");
+            System.err.println("Error: No se ha cargado el icono de Salir (imagenes/Salir.svg.png)");
         }
-        URL iconoMenuIdiomaURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Idioma.svg.png");
+        URL iconoMenuIdiomaURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Idioma.svg.png");
         if (iconoMenuIdiomaURL != null) {
-            ImageIcon iconoMenuIdioma = new ImageIcon(iconoMenuIdiomaURL);
-            menuIdioma.setIcon(iconoMenuIdioma);
+            ImageIcon icono = new ImageIcon(iconoMenuIdiomaURL);
+            menuIdioma.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Idioma");
+            System.err.println("Error: No se ha cargado el icono de Idioma (imagenes/Idioma.svg.png)");
         }
-        URL iconoMenuCrearCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Crear.svg.png");
+        URL iconoMenuCrearCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Crear.svg.png");
         if (iconoMenuCrearCarritoURL != null) {
-            ImageIcon iconoMenuCrearCarrito = new ImageIcon(iconoMenuCrearCarritoURL);
-            menuItemCrearCarrito.setIcon(iconoMenuCrearCarrito);
+            ImageIcon icono = new ImageIcon(iconoMenuCrearCarritoURL);
+            menuItemCrearCarrito.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Crear Carrito");
+            System.err.println("Error: No se ha cargado el icono de Crear Carrito (imagenes/Crear.svg.png)");
         }
-        URL iconoMenuCrearProductoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Crear.svg.png");
+        URL iconoMenuCrearProductoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Crear.svg.png");
         if (iconoMenuCrearProductoURL != null) {
-            ImageIcon iconoMenuCrearProducto = new ImageIcon(iconoMenuCrearProductoURL);
-            menuItemCrearProducto.setIcon(iconoMenuCrearProducto);
+            ImageIcon icono = new ImageIcon(iconoMenuCrearProductoURL);
+            menuItemCrearProducto.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Crear Producto");
+            System.err.println("Error: No se ha cargado el icono de Crear Producto (imagenes/Crear.svg.png)");
         }
-        URL iconoMenuCrearUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Crear.svg.png");
+        URL iconoMenuCrearUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Crear.svg.png");
         if (iconoMenuCrearUsuarioURL != null) {
-            ImageIcon iconoMenuCrearUsuario = new ImageIcon(iconoMenuCrearUsuarioURL);
-            menuItemCrearUsuario.setIcon(iconoMenuCrearUsuario);
+            ImageIcon icono = new ImageIcon(iconoMenuCrearUsuarioURL);
+            menuItemCrearUsuario.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Crear Usuario");
+            System.err.println("Error: No se ha cargado el icono de Crear Usuario (imagenes/Crear.svg.png)");
         }
-        URL iconoMenuBuscarCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Buscar.svg.png");
+        URL iconoMenuBuscarCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Buscar.svg.png");
         if (iconoMenuBuscarCarritoURL != null) {
-            ImageIcon iconoMenuBuscarCarrito = new ImageIcon(iconoMenuBuscarCarritoURL);
-            menuItemBuscarCarrito.setIcon(iconoMenuBuscarCarrito);
+            ImageIcon icono = new ImageIcon(iconoMenuBuscarCarritoURL);
+            menuItemBuscarCarrito.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Buscar Carrito");
+            System.err.println("Error: No se ha cargado el icono de Buscar Carrito (imagenes/Buscar.svg.png)");
         }
-        URL iconoMenuBuscarProductoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Buscar.svg.png");
+        URL iconoMenuBuscarProductoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Buscar.svg.png");
         if (iconoMenuBuscarProductoURL != null) {
-            ImageIcon iconoMenuBuscarProducto = new ImageIcon(iconoMenuBuscarProductoURL);
-            menuItemBuscarProducto.setIcon(iconoMenuBuscarProducto);
+            ImageIcon icono = new ImageIcon(iconoMenuBuscarProductoURL);
+            menuItemBuscarProducto.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Buscar Producto");
+            System.err.println("Error: No se ha cargado el icono de Buscar Producto (imagenes/Buscar.svg.png)");
         }
-        URL iconoMenuBuscarUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Buscar.svg.png");
+        URL iconoMenuBuscarUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Buscar.svg.png");
         if (iconoMenuBuscarUsuarioURL != null) {
-            ImageIcon iconoMenuBuscarUsuario = new ImageIcon(iconoMenuBuscarUsuarioURL);
-            menuItemListarUsuario.setIcon(iconoMenuBuscarUsuario);
+            ImageIcon icono = new ImageIcon(iconoMenuBuscarUsuarioURL);
+            menuItemListarUsuario.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Buscar Usuario");
+            System.err.println("Error: No se ha cargado el icono de Buscar Usuario (imagenes/Buscar.svg.png)");
         }
-        URL iconoMenuEliminarCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Eliminar.svg.png");
+        URL iconoMenuEliminarCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Eliminar.svg.png");
         if (iconoMenuEliminarCarritoURL != null) {
-            ImageIcon iconoMenuEliminarCarrito = new ImageIcon(iconoMenuEliminarCarritoURL);
-            menuItemEliminarCarrito.setIcon(iconoMenuEliminarCarrito);
+            ImageIcon icono = new ImageIcon(iconoMenuEliminarCarritoURL);
+            menuItemEliminarCarrito.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Eliminar Carrito");
+            System.err.println("Error: No se ha cargado el icono de Eliminar Carrito (imagenes/Eliminar.svg.png)");
         }
-        URL iconoMenuEliminarProductoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Eliminar.svg.png");
+        URL iconoMenuEliminarProductoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Eliminar.svg.png");
         if (iconoMenuEliminarProductoURL != null) {
-            ImageIcon iconoMenuEliminarProducto = new ImageIcon(iconoMenuEliminarProductoURL);
-            menuItemEliminarProducto.setIcon(iconoMenuEliminarProducto);
+            ImageIcon icono = new ImageIcon(iconoMenuEliminarProductoURL);
+            menuItemEliminarProducto.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Eliminar Producto");
+            System.err.println("Error: No se ha cargado el icono de Eliminar Producto (imagenes/Eliminar.svg.png)");
         }
-        URL iconoMenuEliminarUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Eliminar.svg.png");
+        URL iconoMenuEliminarUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Eliminar.svg.png");
         if (iconoMenuEliminarUsuarioURL != null) {
-            ImageIcon iconoMenuEliminarUsuario = new ImageIcon(iconoMenuEliminarUsuarioURL);
-            menuItemEliminarUsuario.setIcon(iconoMenuEliminarUsuario);
+            ImageIcon icono = new ImageIcon(iconoMenuEliminarUsuarioURL);
+            menuItemEliminarUsuario.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Eliminar Usuario");
+            System.err.println("Error: No se ha cargado el icono de Eliminar Usuario (imagenes/Eliminar.svg.png)");
         }
-        URL iconoMenuActualizarCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Actualizar.svg.png");
+        URL iconoMenuActualizarCarritoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Actualizar.svg.png");
         if (iconoMenuActualizarCarritoURL != null) {
-            ImageIcon iconoMenuActualizarCarrito = new ImageIcon(iconoMenuActualizarCarritoURL);
-            menuItemModificarCarrito.setIcon(iconoMenuActualizarCarrito);
+            ImageIcon icono = new ImageIcon(iconoMenuActualizarCarritoURL);
+            menuItemModificarCarrito.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Actualizar Carrito");
+            System.err.println("Error: No se ha cargado el icono de Actualizar Carrito (imagenes/Actualizar.svg.png)");
         }
-        URL iconoMenuActualizarProductoURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Actualizar.svg.png");
+        URL iconoMenuActualizarProductoURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Actualizar.svg.png");
         if (iconoMenuActualizarProductoURL != null) {
-            ImageIcon iconoMenuActualizarProducto = new ImageIcon(iconoMenuActualizarProductoURL);
-            menuItemActualizarProducto.setIcon(iconoMenuActualizarProducto);
+            ImageIcon icono = new ImageIcon(iconoMenuActualizarProductoURL);
+            menuItemActualizarProducto.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Actualizar Producto");
+            System.err.println("Error: No se ha cargado el icono de Actualizar Producto (imagenes/Actualizar.svg.png)");
         }
-        URL iconoMenuActualizarUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Actualizar.svg.png");
+        URL iconoMenuActualizarUsuarioURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Actualizar.svg.png");
         if (iconoMenuActualizarUsuarioURL != null) {
-            ImageIcon iconoMenuActualizarUsuario = new ImageIcon(iconoMenuActualizarUsuarioURL);
-            menuItemActualizarUsuario.setIcon(iconoMenuActualizarUsuario);
+            ImageIcon icono = new ImageIcon(iconoMenuActualizarUsuarioURL);
+            menuItemActualizarUsuario.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Actualizar Usuario");
+            System.err.println("Error: No se ha cargado el icono de Actualizar Usuario (imagenes/Actualizar.svg.png)");
         }
-        URL iconoMenuCerrarSesionURL = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Salir.svg.png");
+        URL iconoMenuCerrarSesionURL = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Salir.svg.png");
         if (iconoMenuCerrarSesionURL != null) {
-            ImageIcon iconoMenuCerrarSesion = new ImageIcon(iconoMenuCerrarSesionURL);
-            menuItemCerrarSesion.setIcon(iconoMenuCerrarSesion);
+            ImageIcon icono = new ImageIcon(iconoMenuCerrarSesionURL);
+            menuItemCerrarSesion.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Cerrar Sesión");
+            System.err.println("Error: No se ha cargado el icono de Cerrar Sesión (imagenes/Salir.svg.png)");
         }
-        URL iconoMenuItemURl = MenuPrincipalView.class.getClassLoader().getResource("Imagenes/Exit.svg.png");
+        URL iconoMenuItemURl = MenuPrincipalView.class.getClassLoader().getResource("imagenes/Exit.svg.png");
         if (iconoMenuItemURl != null) {
-            ImageIcon iconoMenuSalir = new ImageIcon(iconoMenuItemURl);
-            menuItemSalir.setIcon(iconoMenuSalir);
+            ImageIcon icono = new ImageIcon(iconoMenuItemURl);
+            menuItemSalir.setIcon(icono);
         } else {
-            System.err.println("Error: No se ha cargado el icono de Salir");
+            System.err.println("Error: No se ha cargado el icono de Salir (imagenes/Exit.svg.png)");
         }
     }
 }

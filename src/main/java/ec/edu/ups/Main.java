@@ -15,7 +15,6 @@ import ec.edu.ups.dao.impl.CarritoDAOArchivo;
 import ec.edu.ups.dao.impl.CuestionarioDAOArchivo;
 import ec.edu.ups.dao.impl.ProductoDAOArchivo;
 import ec.edu.ups.dao.impl.UsuarioDAOArchivo;
-//importes//
 
 
 import ec.edu.ups.modelo.Rol;
@@ -67,21 +66,23 @@ public class Main {
         java.awt.EventQueue.invokeLater(() -> {
             MensajeInternacionalizacionHandler idioma = new MensajeInternacionalizacionHandler("es", "EC");
 
-            // DAOs iniciales/temporales. Estos se usarán para el login y el registro inicial.
-            // Serán reemplazados por los DAOs de archivo si el usuario selecciona esa opción.
-            CuestionarioDAO initialCuestionarioDAO = new CuestionarioDAOMemoria(idioma);
-            UsuarioDAO initialUsuarioDAO = new UsuarioDAOMemoria(initialCuestionarioDAO);
+            // DAOs temporales (en memoria) para el proceso de login inicial.
+            // Siempre comenzaremos con DAOs de memoria para el registro/login.
+            CuestionarioDAO tempCuestionarioDAO = new CuestionarioDAOMemoria(idioma);
+            UsuarioDAO tempUsuarioDAO = new UsuarioDAOMemoria(tempCuestionarioDAO);
 
+            // ÚNICAS INSTANCIAS DE VISTAS DE LOGIN/REGISTRO/CUESTIONARIO
+            // Estas instancias se crean una sola vez al inicio.
             LoginView loginView = new LoginView(idioma);
-            loginView.setVisible(true);
-
-            // Vistas de Cuestionario y Recuperación de Contraseña, inicializadas con el DAO temporal.
-            CuestionarioView cuestionarioView = new CuestionarioView(idioma, initialCuestionarioDAO);
+            RegistrarView registrarView = new RegistrarView(idioma);
+            CuestionarioView cuestionarioView = new CuestionarioView(idioma, tempCuestionarioDAO);
             CuestionarioRecuperarView cuestionarioRecuperarView = new CuestionarioRecuperarView(idioma);
 
-            // El `usuarioController` principal, inicializado con los DAOs iniciales.
-            // Sus DAOs internos se actualizarán cuando el usuario elija el tipo de almacenamiento.
-            UsuarioController usuarioController = new UsuarioController(initialUsuarioDAO, loginView, idioma, initialCuestionarioDAO, cuestionarioView, cuestionarioRecuperarView);
+            // El UsuarioController principal se inicializa con estas únicas instancias.
+            UsuarioController usuarioController = new UsuarioController(tempUsuarioDAO, loginView, idioma, tempCuestionarioDAO, cuestionarioView, cuestionarioRecuperarView);
+            usuarioController.setRegistrarView(registrarView); // Aseguramos que el controlador tenga la referencia a registrarView
+
+            loginView.setVisible(true); // Muestra la ventana de login al inicio
 
             loginView.addWindowListener(new WindowAdapter() {
                 @Override
@@ -102,16 +103,15 @@ public class Main {
                             System.out.println("DEBUG (Main): Almacenamiento seleccionado: Archivo en " + rutaArchivoSeleccionada);
                             File storageDirectory = new File(rutaArchivoSeleccionada);
                             if (!storageDirectory.exists()) {
-                                storageDirectory.mkdirs(); // Crear directorios si no existen
+                                storageDirectory.mkdirs();
                             }
 
-                            // ¡Instanciar los DAOs de ARCHIVO!
                             actualCuestionarioDAO = new CuestionarioDAOArchivo(storageDirectory.getAbsolutePath(), idioma);
                             actualUsuarioDAO = new UsuarioDAOArchivo(storageDirectory.getAbsolutePath(), actualCuestionarioDAO);
                             actualProductoDAO = new ProductoDAOArchivo(storageDirectory.getAbsolutePath());
                             actualCarritoDAO = new CarritoDAOArchivo(storageDirectory.getAbsolutePath());
 
-                        } else { // Si es "Memoria" (u otra opción por defecto)
+                        } else { // Almacenamiento en Memoria
                             System.out.println("DEBUG (Main): Almacenamiento seleccionado: Memoria.");
                             actualCuestionarioDAO = new CuestionarioDAOMemoria(idioma);
                             actualUsuarioDAO = new UsuarioDAOMemoria(actualCuestionarioDAO);
@@ -119,14 +119,33 @@ public class Main {
                             actualCarritoDAO = new CarritoDAOMemoria();
                         }
 
-                        // Actualizar el UsuarioController principal con el DAO de usuario seleccionado
+                        // **** PASO CRÍTICO: ACTUALIZAR EL DAO EN LAS VISTAS Y EN EL CONTROLADOR ****
+                        // Las vistas de cuestionario ya existen, solo hay que actualizarles el DAO.
+                        cuestionarioView.setCuestionarioDAO(actualCuestionarioDAO);
+                        // El cuestionarioRecuperarView no necesita el DAO directamente, lo usa el controlador.
+
+                        // El UsuarioController principal necesita los DAOs actualizados.
                         usuarioController.setUsuarioDAO(actualUsuarioDAO);
-                        // Re-instanciar CuestionarioView y CuestionarioRecuperarView con el DAO de Cuestionario correcto
-                        CuestionarioView finalCuestionarioView = new CuestionarioView(idioma, actualCuestionarioDAO);
-                        CuestionarioRecuperarView finalCuestionarioRecuperarView = new CuestionarioRecuperarView(idioma);
+                        usuarioController.setCuestionarioDAO(actualCuestionarioDAO); // También el DAO del cuestionario
+                        // Las vistas de registro/cuestionario ya fueron pasadas al constructor del controlador,
+                        // no es necesario volver a llamarlos con setCuestionarioView, setRegistrarView, etc.
+                        // El controlador ya tiene las referencias correctas.
+
+                        // Vistas CRUD de Usuario (estas sí se crean/inyectan después de la autenticación)
+                        UsuarioCrearView usuarioCrearView = new UsuarioCrearView(idioma);
+                        UsuarioListarView usuarioListarView = new UsuarioListarView(idioma);
+                        UsuarioEliminarView usuarioEliminarView = new UsuarioEliminarView(idioma);
+                        UsuarioModificarView usuarioModificarView = new UsuarioModificarView(idioma);
+                        // RegistrarView ya fue creada al inicio y pasada al controlador.
+
+                        // Inyectar las vistas CRUD al UsuarioController
+                        usuarioController.setUsuarioCrearView(usuarioCrearView);
+                        usuarioController.setUsuarioListarView(usuarioListarView);
+                        usuarioController.setUsuarioEliminarView(usuarioEliminarView);
+                        usuarioController.setUsuarioModificarView(usuarioModificarView);
 
 
-                        // Instanciar todas las vistas de la aplicación principal
+                        // Instanciar todas las demás vistas de la aplicación principal
                         MenuPrincipalView principalView = new MenuPrincipalView(idioma);
                         ProductoAnadirView productoAnadirView = new ProductoAnadirView(idioma);
                         ProductoListaView productoListaView = new ProductoListaView(idioma);
@@ -138,14 +157,7 @@ public class Main {
                         CarritoModificarView carritoModificarView = new CarritoModificarView(idioma);
                         CarritoEliminarView carritoEliminarView = new CarritoEliminarView(idioma);
 
-                        UsuarioCrearView usuarioCrearView = new UsuarioCrearView(idioma);
-                        UsuarioListarView usuarioListarView = new UsuarioListarView(idioma);
-                        UsuarioEliminarView usuarioEliminarView = new UsuarioEliminarView(idioma);
-                        UsuarioModificarView usuarioModificarView = new UsuarioModificarView(idioma);
-
-                        RegistrarView registrarView = new RegistrarView(idioma);
-
-                        // Añadir vistas al panel de escritorio
+                        // Añadir TODAS las vistas (incluyendo las de cuestionario y registro) al JDesktopPane
                         principalView.getjDesktopPane().add(productoAnadirView);
                         principalView.getjDesktopPane().add(productoListaView);
                         principalView.getjDesktopPane().add(productoActualizarView);
@@ -161,25 +173,26 @@ public class Main {
                         principalView.getjDesktopPane().add(usuarioEliminarView);
                         principalView.getjDesktopPane().add(usuarioModificarView);
 
-                        // Instanciar controladores con los DAOs que el usuario seleccionó
+                        principalView.getjDesktopPane().add(registrarView); // Asegura que RegistrarView esté en el desktop
+                        principalView.getjDesktopPane().add(cuestionarioView); // Asegura que CuestionarioView esté en el desktop
+                        principalView.getjDesktopPane().add(cuestionarioRecuperarView); // Asegura que CuestionarioRecuperarView esté en el desktop
+
+
+                        // Instanciar otros controladores con los DAOs que el usuario seleccionó
                         ProductoController productoController = new ProductoController(actualProductoDAO, productoAnadirView, productoListaView, carritoAnadirView, productoEliminarView, productoActualizarView, idioma);
                         CarritoController carritoController = new CarritoController(actualCarritoDAO, carritoAnadirView, actualProductoDAO, carritoListarView, usuarioAutenticado, carritoModificarView, carritoEliminarView, idioma);
-                        // Pasar las vistas de Cuestionario que usan el DAO de Cuestionario correcto
-                        UsuarioController usuarioController2 = new UsuarioController(actualUsuarioDAO, usuarioCrearView, usuarioListarView, usuarioEliminarView, usuarioModificarView, idioma, registrarView, finalCuestionarioView, finalCuestionarioRecuperarView);
 
                         principalView.mostrarMensaje("Bienvenido: " + usuarioAutenticado.getCedula());
 
                         if (usuarioAutenticado.getRol().equals(Rol.ADMINISTRADOR)) {
-                            // Los menús de administrador están habilitados por defecto, no necesitas hacer nada aquí.
-                            // Si deseas habilitar menús específicos para ADMINISTRADOR, asegúrate de que estén deshabilitados al inicio
-                            // y luego los habilitas aquí.
+                            // Los menús de administrador están habilitados por defecto.
                         } else if (usuarioAutenticado.getRol().equals(Rol.USUARIO)) {
                             principalView.deshabilitarMenusAdministrador();
                         }
 
                         principalView.setVisible(true);
 
-                        // Configuración de los ActionListeners para los elementos del menú principal
+                        // Configuración de ActionListeners para el menú principal
                         principalView.getMenuItemCrearProducto().addActionListener(e1 -> {
                             if (!productoAnadirView.isVisible()) {
                                 productoAnadirView.setVisible(true);
@@ -190,6 +203,7 @@ public class Main {
                         principalView.getMenuItemBuscarProducto().addActionListener(e1 -> {
                             if (!productoListaView.isVisible()) {
                                 productoListaView.setVisible(true);
+                                productoController.listarProductos();
                             }
                             productoListaView.toFront();
                             productoListaView.requestFocus();
@@ -218,6 +232,7 @@ public class Main {
                         principalView.getMenuItemBuscarCarrito().addActionListener(e1 -> {
                             if (!carritoListarView.isVisible()) {
                                 carritoListarView.setVisible(true);
+                                carritoController.listarCarritos();
                             }
                             carritoListarView.toFront();
                             carritoListarView.requestFocus();
@@ -228,9 +243,25 @@ public class Main {
                                 principalView.dispose();
                                 loginView.limpiarCampos();
                                 loginView.setVisible(true);
-                                // Restablecer el `usuarioController` principal a su estado inicial (memoria) para el próximo login
-                                usuarioController.setUsuarioDAO(new UsuarioDAOMemoria(new CuestionarioDAOMemoria(idioma)));
+
+                                // Al cerrar sesión, reinicializamos los DAOs temporales
+                                // y los asignamos de nuevo al controlador y a las vistas de cuestionario
+                                CuestionarioDAO newTempCuestionarioDAO = new CuestionarioDAOMemoria(idioma);
+                                UsuarioDAO newTempUsuarioDAO = new UsuarioDAOMemoria(newTempCuestionarioDAO);
+
+                                usuarioController.setUsuarioDAO(newTempUsuarioDAO);
+                                usuarioController.setCuestionarioDAO(newTempCuestionarioDAO);
                                 usuarioController.setUsuario(null);
+
+                                cuestionarioView.setCuestionarioDAO(newTempCuestionarioDAO); // Actualiza el DAO de la CuestionarioView
+                                cuestionarioView.limpiarCampos(); // Limpia los campos del cuestionario si quedó abierto
+
+                                // Asegúrate de que las vistas de administración también se limpien si es necesario
+                                usuarioCrearView.limpiarCampos();
+                                usuarioListarView.getModelo().setRowCount(0); // Limpia la tabla
+                                usuarioEliminarView.getTxtUsuario().setText("");
+                                usuarioEliminarView.getModelo().setRowCount(0);
+                                usuarioModificarView.limpiarCampos();
                             }
                         });
                         principalView.getMenuItemCrearUsuario().addActionListener(e1 -> {
@@ -243,6 +274,7 @@ public class Main {
                         principalView.getMenuItemListarUsuario().addActionListener(e1 -> {
                             if (!usuarioListarView.isVisible()) {
                                 usuarioListarView.setVisible(true);
+                                usuarioController.listarUsuarios();
                             }
                             usuarioListarView.toFront();
                             usuarioListarView.requestFocus();
@@ -293,10 +325,20 @@ public class Main {
                             productoAnadirView.cambiarIdioma();
                             productoEliminarView.cambiarIdioma();
                             productoListaView.cambiarIdioma();
-                            usuarioModificarView.cambiarIdioma();
-                            usuarioEliminarView.cambiarIdioma();
-                            usuarioCrearView.cambiarIdioma();
-                            usuarioListarView.cambiarIdioma();
+                            usuarioModificarView.cambiarIdioma(idioma);
+                            usuarioEliminarView.cambiarIdioma(idioma);
+                            usuarioCrearView.cambiarIdioma(idioma);
+                            usuarioListarView.cambiarIdioma(idioma);
+                            loginView.actualizarTextos(idioma);
+                            registrarView.cambiarIdioma(idioma);
+                            cuestionarioView.actualizarTextos(idioma);
+                            cuestionarioRecuperarView.actualizarTextos(idioma);
+                            if (actualCuestionarioDAO instanceof CuestionarioDAOArchivo) {
+                                ((CuestionarioDAOArchivo) actualCuestionarioDAO).actualizarIdioma(idioma);
+                            } else if (actualCuestionarioDAO instanceof CuestionarioDAOMemoria) {
+                                ((CuestionarioDAOMemoria) actualCuestionarioDAO).actualizarIdioma(idioma);
+                            }
+                            cuestionarioView.cargarPreguntas();
                         });
                         principalView.getMenuItemIngles().addActionListener(e1 -> {
                             idioma.setLenguaje("en", "US");
@@ -309,10 +351,20 @@ public class Main {
                             productoAnadirView.cambiarIdioma();
                             productoEliminarView.cambiarIdioma();
                             productoListaView.cambiarIdioma();
-                            usuarioModificarView.cambiarIdioma();
-                            usuarioEliminarView.cambiarIdioma();
-                            usuarioCrearView.cambiarIdioma();
-                            usuarioListarView.cambiarIdioma();
+                            usuarioModificarView.cambiarIdioma(idioma);
+                            usuarioEliminarView.cambiarIdioma(idioma);
+                            usuarioCrearView.cambiarIdioma(idioma);
+                            usuarioListarView.cambiarIdioma(idioma);
+                            loginView.actualizarTextos(idioma);
+                            registrarView.cambiarIdioma(idioma);
+                            cuestionarioView.actualizarTextos(idioma);
+                            cuestionarioRecuperarView.actualizarTextos(idioma);
+                            if (actualCuestionarioDAO instanceof CuestionarioDAOArchivo) {
+                                ((CuestionarioDAOArchivo) actualCuestionarioDAO).actualizarIdioma(idioma);
+                            } else if (actualCuestionarioDAO instanceof CuestionarioDAOMemoria) {
+                                ((CuestionarioDAOMemoria) actualCuestionarioDAO).actualizarIdioma(idioma);
+                            }
+                            cuestionarioView.cargarPreguntas();
                         });
                         principalView.getMenuItemFrances().addActionListener(e1 -> {
                             idioma.setLenguaje("fr", "FR");
@@ -325,10 +377,20 @@ public class Main {
                             productoAnadirView.cambiarIdioma();
                             productoEliminarView.cambiarIdioma();
                             productoListaView.cambiarIdioma();
-                            usuarioModificarView.cambiarIdioma();
-                            usuarioEliminarView.cambiarIdioma();
-                            usuarioCrearView.cambiarIdioma();
-                            usuarioListarView.cambiarIdioma();
+                            usuarioModificarView.cambiarIdioma(idioma);
+                            usuarioEliminarView.cambiarIdioma(idioma);
+                            usuarioCrearView.cambiarIdioma(idioma);
+                            usuarioListarView.cambiarIdioma(idioma);
+                            loginView.actualizarTextos(idioma);
+                            registrarView.cambiarIdioma(idioma);
+                            cuestionarioView.actualizarTextos(idioma);
+                            cuestionarioRecuperarView.actualizarTextos(idioma);
+                            if (actualCuestionarioDAO instanceof CuestionarioDAOArchivo) {
+                                ((CuestionarioDAOArchivo) actualCuestionarioDAO).actualizarIdioma(idioma);
+                            } else if (actualCuestionarioDAO instanceof CuestionarioDAOMemoria) {
+                                ((CuestionarioDAOMemoria) actualCuestionarioDAO).actualizarIdioma(idioma);
+                            }
+                            cuestionarioView.cargarPreguntas();
                         });
                     }
                 }

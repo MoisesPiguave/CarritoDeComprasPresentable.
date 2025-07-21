@@ -464,4 +464,25 @@ public class CarritoController {
             carritoListarView.mostrarMensaje(idioma.get("error.listar.carritos") + ": " + e.getMessage());
         }
     }
+
+    /**
+     * Lista todos los carritos disponibles y los muestra en la vista de listado.
+     * Este método es público para ser invocado desde la clase principal (Main)
+     * cuando se necesite refrescar la lista de carritos en la UI.
+     * Si no hay carritos, la tabla se vacía y se muestra un mensaje informativo.
+     */
+    public void listarCarritos() {
+        try {
+            List<Carrito> carritos = carritoDAO.listarTodos();
+            if (carritos.isEmpty()) {
+                carritoListarView.mostrarMensaje(idioma.get("carrito.lista.vacia"));
+                carritoListarView.limpiarCampos(); // Limpia la tabla si no hay carritos
+            } else {
+                carritoListarView.cargarDatos(carritos);
+                carritoListarView.mostrarMensaje(idioma.get("carrito.listado.exitoso") + " (" + carritos.size() + ")");
+            }
+        } catch (Exception e) {
+            carritoListarView.mostrarMensaje(idioma.get("error.listar.carritos") + ": " + e.getMessage());
+        }
+    }
 }

@@ -62,7 +62,7 @@ public class UsuarioModificarView extends JInternalFrame {
         for (int i = 1; i <= 31; i++) cbxDia.addItem(i);
         for (int i = 1980; i <= 2025; i++) cbxAño.addItem(i);
 
-        cambiarIdioma();
+        cambiarIdioma(idioma);
         iconos();
     }
 
@@ -72,23 +72,23 @@ public class UsuarioModificarView extends JInternalFrame {
      * Esto incluye el título de la ventana, etiquetas, textos de botones y las opciones
      * del ComboBox para los meses.
      */
-    public void cambiarIdioma() {
-        setTitle(idioma.get("usuario.modificar.titulo"));
-        lblUser.setText(idioma.get("usuario.modificar.usuario_buscar"));
-        lblActualizar.setText(idioma.get("usuario.modificar.actualizar"));
-        lblUsuario.setText(idioma.get("usuario.modificar.usuario"));
-        lblContraseña.setText(idioma.get("usuario.modificar.contrasena"));
-        lblNombreC.setText(idioma.get("usuario.modificar.nombre_completo"));
-        lblCorreo.setText(idioma.get("usuario.modificar.correo"));
-        lblCelular.setText(idioma.get("usuario.modificar.celular"));
-        lblFechaN.setText(idioma.get("usuario.modificar.fecha_nacimiento"));
-        btnBuscar.setText(idioma.get("boton.usuario.modificar.buscar"));
-        btnEditar.setText(idioma.get("boton.usuario.modificar.editar"));
+    public void cambiarIdioma(MensajeInternacionalizacionHandler idioma) {
+        setTitle(this.idioma.get("usuario.modificar.titulo"));
+        lblUser.setText(this.idioma.get("usuario.modificar.usuario_buscar"));
+        lblActualizar.setText(this.idioma.get("usuario.modificar.actualizar"));
+        lblUsuario.setText(this.idioma.get("usuario.modificar.usuario"));
+        lblContraseña.setText(this.idioma.get("usuario.modificar.contrasena"));
+        lblNombreC.setText(this.idioma.get("usuario.modificar.nombre_completo"));
+        lblCorreo.setText(this.idioma.get("usuario.modificar.correo"));
+        lblCelular.setText(this.idioma.get("usuario.modificar.celular"));
+        lblFechaN.setText(this.idioma.get("usuario.modificar.fecha_nacimiento"));
+        btnBuscar.setText(this.idioma.get("boton.usuario.modificar.buscar"));
+        btnEditar.setText(this.idioma.get("boton.usuario.modificar.editar"));
 
         cbxMes.removeAllItems();
 
         for (int i = 1; i <= 12; i++) {
-            cbxMes.addItem(idioma.get("mes." + i)); // Usar claves como "mes.1" para enero, etc.
+            cbxMes.addItem(this.idioma.get("mes." + i)); // Usar claves como "mes.1" para enero, etc.
         }
     }
 

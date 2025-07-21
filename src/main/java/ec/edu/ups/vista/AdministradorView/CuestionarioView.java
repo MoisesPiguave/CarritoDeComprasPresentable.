@@ -18,11 +18,12 @@ import java.net.URL;
  * @version 1.0
  * @since 17 de julio de 2025
  */
-public class CuestionarioView extends JFrame {
+// ¡¡¡CAMBIO CRÍTICO AQUÍ: DEBE EXTENDER JInternalFrame!!!
+public class CuestionarioView extends JInternalFrame { // <-- ¡ESTO ES LO QUE DEBES CAMBIAR!
     private JComboBox cbxPreguntas;
     private JTextField txtRespuesta;
     private JButton btnGuardar;
-    private JPanel panelPrincipal;
+    private JPanel panelPrincipal; // Este JPanel contendrá el contenido del formulario .form
     private JButton btnTerminar;
     private JLabel lblTitulo;
     private JLabel lblPregunta;
@@ -42,14 +43,30 @@ public class CuestionarioView extends JFrame {
     public CuestionarioView( MensajeInternacionalizacionHandler idioma, CuestionarioDAO cuestionarioDAO) {
         this.idioma = idioma;
         this.cuestionarioDAO = cuestionarioDAO;
+
+        // Cuando cambias a JInternalFrame, algunas propiedades de JFrame pueden necesitar ajustes.
+        // setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Esto se convierte en setClosable(true) para JInternalFrame
+
+        // Propiedades comunes de JInternalFrame que puedes querer establecer:
+        setClosable(true); // Permite cerrar la ventana interna
+        setMaximizable(true); // Permite maximizar
+        setResizable(true); // Permite redimensionar
+        setIconifiable(true); // Permite minimizar a un icono en el desktop
+
         setContentPane(panelPrincipal);
         setTitle("Cuestionario");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(550, 350);
-        setLocationRelativeTo(null);
+        // setLocationRelativeTo(null); // Esto no se usa en JInternalFrame directamente para el posicionamiento
+        // Su posición inicial se establece al añadirla al JDesktopPane o con setLocation(x, y)
         icono();
-        cargarPreguntas();
+        // Solo cargar preguntas si el DAO NO es nulo al inicio
+        if (this.cuestionarioDAO != null) {
+            cargarPreguntas();
+        }
     }
+
+    // ... (El resto de tus métodos getters, setters y lógicos permanecen IGUAL)
+    // No he modificado nada más que la herencia y comentado setDefaultCloseOperation.
 
     /**
      * Obtiene el JComboBox que muestra las preguntas del cuestionario.
@@ -192,19 +209,21 @@ public class CuestionarioView extends JFrame {
      * Si un icono no se encuentra, imprime un mensaje de error en la consola.
      */
     private void icono() {
+        // Asumiendo que LoginView.class.getClassLoader() es un punto de partida válido para recursos
+        // Si las imágenes están en un módulo diferente o la clase cargadora cambia, esto puede fallar.
         URL botonGuardarCuestionario = LoginView.class.getClassLoader().getResource("imagenes/Guardar.svg.png");
         if (botonGuardarCuestionario != null) {
             ImageIcon icono = new ImageIcon(botonGuardarCuestionario);
             btnGuardar.setIcon(icono);
         } else {
-            System.err.println("Icono no encontrado");
+            System.err.println("Icono no encontrado: imagenes/Guardar.svg.png");
         }
         URL botonTerminarCuestionario = LoginView.class.getClassLoader().getResource("imagenes/Terminar.svg.png");
         if (botonTerminarCuestionario != null) {
             ImageIcon icono = new ImageIcon(botonTerminarCuestionario);
             btnTerminar.setIcon(icono);
         } else {
-            System.err.println("Icono no encontrado");
+            System.err.println("Icono no encontrado: imagenes/Terminar.svg.png");
         }
     }
 
@@ -218,13 +237,35 @@ public class CuestionarioView extends JFrame {
     }
 
     /**
+     * Establece el DAO de cuestionario para esta vista.
+     * Esto es crucial para que la vista pueda cargar las preguntas correctas.
+     * @param cuestionarioDAO El DAO de cuestionario a establecer.
+     */
+    public void setCuestionarioDAO(CuestionarioDAO cuestionarioDAO) {
+        this.cuestionarioDAO = cuestionarioDAO;
+        // Recarga las preguntas cada vez que el DAO cambie para asegurar que los datos son los correctos.
+        if (this.cuestionarioDAO != null) {
+            cargarPreguntas();
+        }
+    }
+
+    /**
      * Carga las preguntas desde el {@link CuestionarioDAO} y las añade al JComboBox.
      * Limpia los ítems existentes en el combo box antes de cargar los nuevos.
      */
     public void cargarPreguntas() {
-        cbxPreguntas.removeAllItems();
-        for (Preguntas pregunta : cuestionarioDAO.listarPreguntas()) {
-            cbxPreguntas.addItem(pregunta);
+        if (cbxPreguntas != null && cuestionarioDAO != null) {
+            cbxPreguntas.removeAllItems();
+            try {
+                for (Preguntas p : cuestionarioDAO.listarPreguntas()) {
+                    cbxPreguntas.addItem(p);
+                }
+            } catch (Exception e) {
+                System.err.println("Error al cargar preguntas en CuestionarioView: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, idioma.get("error.cargar.preguntas") + ": " + e.getMessage(), idioma.get("error.titulo"), JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            System.err.println("Advertencia: No se pueden cargar preguntas. ComboBox o CuestionarioDAO es nulo.");
         }
     }
 

@@ -3,21 +3,25 @@ package ec.edu.ups.dao.impl;
 import ec.edu.ups.dao.CarritoDAO;
 import ec.edu.ups.modelo.Carrito;
 import ec.edu.ups.modelo.Usuario;
+import ec.edu.ups.modelo.Producto;
+import ec.edu.ups.modelo.ItemCarrito;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets; // Sigue siendo útil para especificar la codificación en archivos de texto
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale; // Necesario para String.format de double
+import java.util.Locale;
 
 /**
  * Implementación de {@link CarritoDAO} que gestiona la persistencia de objetos {@link Carrito}
  * utilizando dos formatos de archivo en el sistema de ficheros:
  * <ul>
- * <li>Archivo binario (.dat): para el objeto completo serializado.</li>
- * <li>Archivo de texto (.txt): para metadatos clave como código, cédula de usuario y total, con longitud fija.</li>
+ * <li>Archivo binario (.dat): para la lista completa de objetos {@link Carrito} serializada.</li>
+ * <li>Archivo de texto (.txt): para metadatos clave de cada carrito, con formato de longitud fija y mejor legibilidad.</li>
  * </ul>
- * Esta versión utiliza operaciones básicas de {@code java.io} y bucles tradicionales,
+ * Esta versión ha sido modificada para almacenar **todos los carritos en un único archivo binario**
+ * y **un único archivo de texto**, sobrescribiendo el contenido completo en cada operación de guardado.
+ * Utiliza operaciones básicas de {@code java.io} y bucles tradicionales,
  * evitando las APIs de {@code java.nio} y {@code java.util.stream}, para mantener el código más directo.
  * Utiliza un esquema de numeración secuencial para los códigos de carrito.
  *
@@ -30,12 +34,18 @@ public class CarritoDAOArchivo implements CarritoDAO {
     private final String storageDirectoryPath;
     private int nextCodigo = 1;
 
-    // --- Definición de longitudes fijas para el archivo de texto ---
+    // --- NUEVAS RUTAS DE ARCHIVO GLOBALES para el almacenamiento único de TODOS los carritos ---
+    private final String ALL_CARTS_BINARY_FILE_PATH;
+    private final String ALL_CARTS_TEXT_FILE_PATH;
+
+    // --- Definición de longitudes fijas para el archivo de texto (para cada campo del carrito) ---
     private static final int CODIGO_LENGTH = 5;
     private static final int USUARIO_CEDULA_LENGTH = 10;
-    private static final int TOTAL_LENGTH_LENGTH = 10;
-    private static final int TOTAL_TEXT_RECORD_LENGTH =
-            CODIGO_LENGTH + USUARIO_CEDULA_LENGTH + TOTAL_LENGTH_LENGTH;
+    private static final int TOTAL_LENGTH = 12;
+    private static final int ITEMS_SUMMARY_LENGTH = 100; // Ajusta según el tamaño esperado del resumen de ítems
+
+    private static final int BASE_TEXT_RECORD_LENGTH =
+            CODIGO_LENGTH + USUARIO_CEDULA_LENGTH + TOTAL_LENGTH + ITEMS_SUMMARY_LENGTH;
 
     /**
      * Constructor de la clase CarritoDAOArchivo.
@@ -44,37 +54,18 @@ public class CarritoDAOArchivo implements CarritoDAO {
      * @param directoryPath La ruta base del directorio donde se almacenarán los archivos de carritos.
      */
     public CarritoDAOArchivo(String directoryPath) {
-        // Concatenamos para crear la ruta específica para carritos, usando File.separator para compatibilidad.
         this.storageDirectoryPath = directoryPath + File.separator + "carritos";
         File directory = new File(this.storageDirectoryPath);
         if (!directory.exists()) {
-            if (!directory.mkdirs()) { // Crea el directorio si no existe. Devuelve false si falla.
+            if (!directory.mkdirs()) {
                 System.err.println("Error al crear el directorio de almacenamiento de carritos: " + storageDirectoryPath);
             }
         }
-        this.nextCodigo = getNextAvailableCodigo();
-    }
 
-    /**
-     * Construye el objeto {@link File} para el archivo binario de un carrito dado su código.
-     * El archivo binario guarda el objeto {@link Carrito} completo serializado.
-     *
-     * @param codigo El código del carrito.
-     * @return El objeto {@link File} que representa el archivo binario (.dat) del carrito.
-     */
-    private File getBinaryFile(int codigo) {
-        return new File(storageDirectoryPath + File.separator + codigo + ".dat");
-    }
+        this.ALL_CARTS_BINARY_FILE_PATH = this.storageDirectoryPath + File.separator + "all_carritos.dat";
+        this.ALL_CARTS_TEXT_FILE_PATH = this.storageDirectoryPath + File.separator + "all_carritos.txt";
 
-    /**
-     * Construye el objeto {@link File} para el archivo de texto de un carrito dado su código.
-     * El archivo de texto guarda metadatos en un formato de longitud fija.
-     *
-     * @param codigo El código del carrito.
-     * @return El objeto {@link File} que representa el archivo de texto (.txt) del carrito.
-     */
-    private File getTextFile(int codigo) {
-        return new File(storageDirectoryPath + File.separator + codigo + ".txt");
+        this.nextCodigo = getNextAvailableCodigoFromAllCarritos();
     }
 
     /**
@@ -91,45 +82,126 @@ public class CarritoDAOArchivo implements CarritoDAO {
             text = "";
         }
         if (text.length() > length) {
-            return text.substring(0, length); // Trunca si es demasiado largo
+            return text.substring(0, length);
         }
-        return String.format("%-" + length + "s", text); // Rellena con espacios a la derecha
+        return String.format("%-" + length + "s", text);
     }
 
     /**
      * Determina el siguiente código disponible para un nuevo carrito,
-     * basándose en el código más alto de los archivos .dat existentes en el directorio de almacenamiento.
+     * basándose en el código más alto de los carritos cargados desde el archivo único.
      *
      * @return El siguiente código entero disponible para un carrito.
      */
-    private int getNextAvailableCodigo() {
+    private int getNextAvailableCodigoFromAllCarritos() {
         int maxCodigo = 0;
-        File directory = new File(storageDirectoryPath);
-        File[] files = directory.listFiles(); // Lista todos los archivos en el directorio
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile() && file.getName().endsWith(".dat")) {
-                    try {
-                        String fileName = file.getName();
-                        // Asume que el nombre de archivo es "codigo.dat"
-                        int codigo = Integer.parseInt(fileName.substring(0, fileName.indexOf(".")));
-                        if (codigo > maxCodigo) {
-                            maxCodigo = codigo;
-                        }
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error de formato de nombre de archivo al buscar código: " + file.getName());
-                    }
-                }
+        List<Carrito> allCarritos = listarTodos();
+        for (Carrito carrito : allCarritos) {
+            if (carrito.getCodigo() > maxCodigo) {
+                maxCodigo = carrito.getCodigo();
             }
         }
         return maxCodigo + 1;
     }
 
     /**
+     * Genera una cadena de texto que resume los ítems de un carrito para el archivo de texto.
+     * Formato: "Producto1(xCantidad);Producto2(xCantidad);"
+     *
+     * @param items La lista de {@link ItemCarrito} del carrito.
+     * @return Una cadena resumida de los ítems.
+     */
+    private String formatItemsForText(List<ItemCarrito> items) {
+        if (items == null || items.isEmpty()) {
+            return "No items";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (ItemCarrito item : items) {
+            // --- VERIFICACIONES DE NULIDAD PARA CADA ITEM Y SUS PROPIEDADES ---
+            if (item != null) {
+                String productName = "";
+                int quantity = 0; // Se asume int, si fuera Integer, necesitaría null check
+
+                if (item.getProducto() != null && item.getProducto().getNombre() != null) {
+                    productName = item.getProducto().getNombre();
+                } else {
+                    // Si el producto o su nombre son nulos, se usa un marcador de posición
+                    productName = "Producto Desconocido";
+                }
+
+                quantity = item.getCantidad(); // Asumiendo que getCantidad() devuelve un int primitivo
+
+                // Solo añade el ítem si el nombre del producto no está vacío después de las verificaciones
+                if (!productName.trim().isEmpty()) {
+                    sb.append(productName.replace(";", ",").replace(":", "-"))
+                            .append("(x")
+                            .append(quantity)
+                            .append(");");
+                } else {
+                    System.err.println("Advertencia: ItemCarrito con nombre de producto vacío encontrado.");
+                }
+            } else {
+                System.err.println("Advertencia: Se encontró un ItemCarrito nulo en la lista de ítems del carrito.");
+            }
+        }
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == ';') {
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
+
+    /**
+     * Guarda la lista completa de carritos en el archivo binario y en el archivo de texto.
+     * Este método sobrescribe el contenido anterior de ambos archivos.
+     *
+     * @param carritos La lista de {@link Carrito} a guardar.
+     */
+    private void saveAllCarritos(List<Carrito> carritos) {
+        // 1. Guardar en archivo BINARIO
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ALL_CARTS_BINARY_FILE_PATH))) {
+            oos.writeObject(carritos);
+            System.out.println("Todos los carritos guardados en archivo BINARIO: " + ALL_CARTS_BINARY_FILE_PATH);
+        } catch (IOException e) {
+            System.err.println("Error al guardar TODOS los carritos en archivo BINARIO: " + e.getMessage());
+        }
+
+        // 2. Guardar en archivo de TEXTO (formato mejorado para legibilidad)
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ALL_CARTS_TEXT_FILE_PATH), StandardCharsets.UTF_8))) {
+            for (Carrito carrito : carritos) {
+                writer.write("--- INICIO CARRITO ---");
+                writer.newLine();
+
+                writer.write(fixedLengthString("Código: " + carrito.getCodigo(), BASE_TEXT_RECORD_LENGTH));
+                writer.newLine();
+
+                String cedulaUsuario = (carrito.getUsuario() != null && carrito.getUsuario().getCedula() != null) ? carrito.getUsuario().getCedula() : "N/A";
+                writer.write(fixedLengthString("Usuario (Cédula): " + cedulaUsuario, BASE_TEXT_RECORD_LENGTH));
+                writer.newLine();
+
+                String totalAsString = String.format(Locale.US, "%.2f", carrito.getTotal());
+                writer.write(fixedLengthString("Total: $" + totalAsString, BASE_TEXT_RECORD_LENGTH));
+                writer.newLine();
+
+                // Aquí se llama al método formatItemsForText
+                writer.write(fixedLengthString("Items: " + formatItemsForText(carrito.obtenerItems()), BASE_TEXT_RECORD_LENGTH));
+                writer.newLine();
+
+                writer.write("--- FIN CARRITO ---");
+                writer.newLine();
+                writer.newLine();
+            }
+            System.out.println("Todos los carritos guardados en archivo de TEXTO: " + ALL_CARTS_TEXT_FILE_PATH);
+        } catch (IOException e) {
+            System.err.println("Error al guardar TODOS los carritos en archivo de TEXTO: " + e.getMessage());
+        }
+    }
+
+    /**
      * Crea y persiste un nuevo carrito en el sistema de archivos.
-     * El carrito se guarda en un archivo binario (serializado) y en un archivo de texto
-     * con formato de longitud fija para sus metadatos clave. Se le asigna un nuevo código secuencial.
+     * El carrito se añade a la colección existente y se guarda la lista completa
+     * en un único archivo binario (serializado) y un único archivo de texto.
+     * Se le asigna un nuevo código secuencial.
      *
      * @param carrito El objeto Carrito a ser creado y persistido.
      * @throws IllegalArgumentException Si el carrito proporcionado es nulo.
@@ -140,125 +212,43 @@ public class CarritoDAOArchivo implements CarritoDAO {
             throw new IllegalArgumentException("El carrito no puede ser nulo para la creación.");
         }
 
+        // Asigna el siguiente código disponible y lo incrementa
         carrito.setCodigo(nextCodigo);
         nextCodigo++;
-        Carrito copia = carrito.copiar(); // Se usa copia para asegurar independencia
 
-        // 1. Guardar en archivo binario (serialización de objeto)
-        File binaryFile = getBinaryFile(copia.getCodigo());
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binaryFile))) {
-            oos.writeObject(copia);
-            System.out.println("Carrito creado y guardado BINARIO, codigo: " + copia.getCodigo());
-        } catch (IOException e) {
-            System.err.println("Error al guardar carrito en archivo BINARIO: " + e.getMessage());
-        }
+        List<Carrito> carritos = listarTodos();
 
-        // 2. Guardar en archivo de texto (formato de longitud fija)
-        File textFile = getTextFile(copia.getCodigo());
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(textFile), StandardCharsets.UTF_8))) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(fixedLengthString(String.valueOf(copia.getCodigo()), CODIGO_LENGTH));
+        // Puedes añadir una verificación si el código ya existe, aunque `nextCodigo` debería prevenirlo.
+        // boolean existe = carritos.stream().anyMatch(c -> c.getCodigo() == carrito.getCodigo());
+        // if (existe) { ... }
 
-            String cedulaUsuario = "";
-            if (copia.getUsuario() != null) {
-                cedulaUsuario = copia.getUsuario().getCedula();
-            }
-            sb.append(fixedLengthString(cedulaUsuario, USUARIO_CEDULA_LENGTH));
+        carritos.add(carrito);
+        System.out.println("Carrito añadido a la colección en memoria: " + carrito.getCodigo());
 
-            // Formatea el total a 2 decimales con Locale.US para asegurar el punto como separador decimal.
-            String totalAsString = String.format(Locale.US, "%.2f", copia.getTotal());
-            sb.append(fixedLengthString(totalAsString, TOTAL_LENGTH_LENGTH));
-
-            writer.write(sb.toString());
-            System.out.println("Carrito creado y guardado TEXTO, codigo: " + copia.getCodigo());
-        } catch (IOException e) {
-            System.err.println("Error al guardar carrito en archivo de TEXTO: " + e.getMessage());
-        }
+        saveAllCarritos(carritos);
     }
 
     /**
-     * Busca y recupera un carrito por su código.
-     * Prioriza la lectura del archivo binario. Si este no existe o hay un error de lectura,
-     * intenta leer el carrito desde su representación en archivo de texto plano como fallback.
+     * Busca y recupera un carrito por su código de la colección completa de carritos.
      *
      * @param codigo El código del carrito a buscar.
-     * @return El objeto Carrito si se encuentra, o null si no existe o hay un error de lectura en ambos formatos.
+     * @return El objeto Carrito si se encuentra, o null si no existe un carrito con ese código.
      */
     @Override
     public Carrito buscarPorCodigo(int codigo) {
         if (codigo <= 0) {
             return null;
         }
-
-        File binaryFile = getBinaryFile(codigo);
-        if (binaryFile.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(binaryFile))) {
-                return (Carrito) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Error al leer carrito de archivo BINARIO para código " + codigo + ", intentando archivo de texto: " + e.getMessage());
-                // Si falla la lectura binaria, intenta leer del archivo de texto
-                return readCarritoFromTextFile(codigo);
-            }
-        } else {
-            // Si el binario no existe, intenta leer del archivo de texto
-            return readCarritoFromTextFile(codigo);
-        }
-    }
-
-    /**
-     * Lee un objeto Carrito desde su representación en archivo de texto plano.
-     * Este método se utiliza como fallback si el archivo binario no está disponible o es ilegible.
-     * El carrito recuperado de texto tendrá un objeto Usuario 'dummy' con solo la cédula (si está disponible)
-     * y el total, ya que la información completa de ítems no se guarda en el archivo de texto.
-     *
-     * @param codigo El código del carrito a leer.
-     * @return El objeto Carrito reconstruido desde el archivo de texto, o null si falla la lectura o el parseo.
-     */
-    private Carrito readCarritoFromTextFile(int codigo) {
-        File textFile = getTextFile(codigo);
-        if (textFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(textFile), StandardCharsets.UTF_8))) {
-                String line = reader.readLine();
-                if (line != null && line.length() >= TOTAL_TEXT_RECORD_LENGTH) {
-                    // Parsear los campos de la línea de longitud fija
-                    String parsedCodigoStr = line.substring(0, CODIGO_LENGTH).trim();
-                    String parsedUsuarioCedula = line.substring(CODIGO_LENGTH, CODIGO_LENGTH + USUARIO_CEDULA_LENGTH).trim();
-                    String parsedTotalStr = line.substring(CODIGO_LENGTH + USUARIO_CEDULA_LENGTH, TOTAL_TEXT_RECORD_LENGTH).trim();
-
-                    int parsedCodigo = Integer.parseInt(parsedCodigoStr);
-                    double parsedTotal = Double.parseDouble(parsedTotalStr);
-
-                    Usuario dummyUsuario = null;
-                    if (!parsedUsuarioCedula.isEmpty()) {
-                        // Creamos un usuario "dummy" solo con la cédula, ya que el resto de datos no están en el TXT.
-                        // El resto de los campos del usuario (contraseña, rol, etc.) serán nulos o por defecto.
-                        dummyUsuario = new Usuario(parsedUsuarioCedula, "", null);
-                    } else {
-                        // Si no hay cédula, se puede crear un usuario con una cédula por defecto o dejarlo nulo.
-                        // Depende de si el Carrito modelo permite usuario nulo o requiere una cédula válida.
-                        dummyUsuario = new Usuario("0000000000", "", null); // Ejemplo: cédula por defecto
-                    }
-
-                    // Se crea el carrito. Su total se calculará dinámicamente en base a sus ítems.
-                    // Si el Carrito modelo no tiene un constructor para setear el total, este valor no se usará.
-                    // Aquí, el Carrito constructor con (codigo, usuario) no acepta el total,
-                    // así que el 'parsedTotal' de la línea TXT se ignora para la construcción del objeto Carrito,
-                    // lo cual es coherente si el modelo de Carrito calcula su total dinámicamente.
-                    Carrito carrito = new Carrito(parsedCodigo, dummyUsuario);
-                    // carrito.setTotal(parsedTotal); // Si el modelo de Carrito tuviera un setTotal y el total fuera un campo persistido
-                    return carrito;
-                }
-            } catch (IOException | NumberFormatException | IndexOutOfBoundsException e) {
-                System.err.println("Error al leer o parsear carrito de archivo de TEXTO para código " + codigo + ": " + e.getMessage());
-            }
-        }
-        return null;
+        return listarTodos().stream()
+                .filter(c -> c.getCodigo() == codigo)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
      * Actualiza un carrito existente en el sistema de archivos.
-     * La operación de actualización se implementa eliminando las versiones anteriores del carrito
-     * (binaria y de texto) y luego creando nuevas con los datos actualizados.
+     * La operación implica cargar todos los carritos, encontrar y reemplazar el carrito a actualizar,
+     * y luego volver a guardar la lista completa en los archivos.
      *
      * @param carrito El objeto Carrito con los datos actualizados.
      * @throws IllegalArgumentException Si el carrito proporcionado es nulo.
@@ -268,78 +258,143 @@ public class CarritoDAOArchivo implements CarritoDAO {
         if (carrito == null) {
             throw new IllegalArgumentException("El carrito no puede ser nulo para la actualización.");
         }
-        eliminar(carrito.getCodigo()); // Elimina los archivos existentes (binario y texto)
-        crear(carrito); // Crea nuevos archivos con la información actualizada
+
+        List<Carrito> carritos = listarTodos();
+        boolean encontrado = false;
+
+        for (int i = 0; i < carritos.size(); i++) {
+            if (carritos.get(i).getCodigo() == carrito.getCodigo()) {
+                carritos.set(i, carrito);
+                encontrado = true;
+                System.out.println("Carrito actualizado en la colección en memoria: " + carrito.getCodigo());
+                break;
+            }
+        }
+
+        if (!encontrado) {
+            System.err.println("Error: El carrito con código " + carrito.getCodigo() + " no fue encontrado para actualizar.");
+            return;
+        }
+
+        saveAllCarritos(carritos);
     }
 
     /**
-     * Elimina un carrito del sistema de archivos, removiendo tanto su archivo binario como de texto.
+     * Elimina un carrito del sistema de archivos, removiendo su entrada de la colección completa.
+     * La operación implica cargar todos los carritos, eliminar el carrito especificado,
+     * y luego volver a guardar la lista reducida en los archivos.
      *
      * @param codigo El código del carrito a eliminar.
      */
     @Override
     public void eliminar(int codigo) {
-        File binaryFile = getBinaryFile(codigo);
-        File textFile = getTextFile(codigo);
+        List<Carrito> carritos = listarTodos();
 
-        boolean binaryDeleted = false;
-        boolean textDeleted = false;
+        boolean removido = carritos.removeIf(c -> c.getCodigo() == codigo);
 
-        // Intentar eliminar el archivo binario
-        if (binaryFile.exists()) {
-            binaryDeleted = binaryFile.delete();
-            if (!binaryDeleted) {
-                System.err.println("Error al eliminar el archivo BINARIO del carrito con código " + codigo);
-            }
+        if (removido) {
+            System.out.println("Carrito eliminado de la colección en memoria: " + codigo);
+            saveAllCarritos(carritos);
         } else {
-            binaryDeleted = true; // Si no existe, se considera "eliminado" exitosamente
-        }
-
-        // Intentar eliminar el archivo de texto
-        if (textFile.exists()) {
-            textDeleted = textFile.delete();
-            if (!textDeleted) {
-                System.err.println("Error al eliminar el archivo de TEXTO del carrito con código " + codigo);
-            }
-        } else {
-            textDeleted = true; // Si no existe, se considera "eliminado" exitosamente
-        }
-
-        if (binaryDeleted && textDeleted) {
-            System.out.println("Carrito eliminado (binario y texto), codigo: " + codigo);
-        } else {
-            System.err.println("Advertencia: No se pudieron eliminar todos los archivos del carrito con código " + codigo);
+            System.err.println("Error: El carrito con código " + codigo + " no fue encontrado para eliminar.");
         }
     }
 
     /**
      * Lista todos los carritos persistidos en el sistema de archivos.
-     * Lee los archivos binarios (.dat) y los deserializa para reconstruir los objetos Carrito completos.
-     * Si hay un error al leer un archivo binario, ese carrito se omite de la lista.
+     * Lee la lista completa de carritos del único archivo binario (.dat)
+     * y la deserializa. Si el archivo binario no existe o hay un error de lectura,
+     * intenta reconstruir la lista desde el archivo de texto.
      *
-     * @return Una lista de todos los objetos Carrito encontrados.
-     * Retorna una lista vacía si no hay carritos o si ocurren errores de lectura.
+     * @return Una {@link List} que contiene todos los objetos {@link Carrito} encontrados.
+     * Retorna una lista vacía si no hay carritos o si ocurren errores de lectura en ambos formatos.
      */
     @Override
     public List<Carrito> listarTodos() {
         List<Carrito> carritos = new ArrayList<>();
-        File directory = new File(storageDirectoryPath);
-        File[] files = directory.listFiles(); // Lista todos los archivos en el directorio
+        File binaryFile = new File(ALL_CARTS_BINARY_FILE_PATH);
 
-        if (files != null) {
-            for (File file : files) {
-                // Solo consideramos los archivos binarios para listar, ya que son los que tienen el objeto completo.
-                if (file.isFile() && file.getName().endsWith(".dat")) {
-                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                        Carrito carrito = (Carrito) ois.readObject();
-                        if (carrito != null) { // Asegurarse de que el objeto deserializado no sea nulo
+        if (binaryFile.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(binaryFile))) {
+                Object obj = ois.readObject();
+                if (obj instanceof List) {
+                    carritos.addAll((List<Carrito>) obj);
+                } else {
+                    System.err.println("El contenido del archivo binario no es una lista de carritos. Intentando leer del archivo de texto.");
+                    carritos = readAllCarritosFromTextFile();
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("Error al leer la lista de carritos del archivo BINARIO principal: " + e.getMessage());
+                System.out.println("Intentando reconstruir la lista desde el archivo de texto principal...");
+                carritos = readAllCarritosFromTextFile();
+            }
+        } else {
+            System.out.println("Archivo binario de carritos principal no encontrado. Intentando leer del archivo de texto principal...");
+            carritos = readAllCarritosFromTextFile();
+        }
+        return carritos;
+    }
+
+    /**
+     * Método auxiliar para reconstruir una lista de objetos {@link Carrito} a partir de su representación
+     * en un único archivo de texto plano con formato de longitud fija, cada carrito separado por delimitadores.
+     * Debido a la complejidad de reconstruir la lista de ítems de carrito desde una sola línea de texto de longitud fija,
+     * los carritos recuperados de texto tendrán una lista de ítems vacía y el total recalculado si el modelo lo permite.
+     * Este método es principalmente un respaldo.
+     *
+     * @return La {@link List} de objetos {@link Carrito} reconstruidos con los datos disponibles en el archivo de texto,
+     * o una lista vacía si falla la lectura o el parseo.
+     */
+    private List<Carrito> readAllCarritosFromTextFile() {
+        List<Carrito> carritos = new ArrayList<>();
+        File textFile = new File(ALL_CARTS_TEXT_FILE_PATH);
+        if (textFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(textFile), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().equals("--- INICIO CARRITO ---")) {
+                        try {
+                            int parsedCodigo = 0;
+                            String parsedUsuarioCedula = "";
+                            double parsedTotal = 0.0;
+
+                            line = reader.readLine(); // Código
+                            if (line != null && line.startsWith("Código: ")) {
+                                parsedCodigo = Integer.parseInt(line.substring("Código: ".length()).trim());
+                            }
+                            line = reader.readLine(); // Usuario
+                            if (line != null && line.startsWith("Usuario (Cédula): ")) {
+                                parsedUsuarioCedula = line.substring("Usuario (Cédula): ".length()).trim();
+                            }
+                            line = reader.readLine(); // Total
+                            if (line != null && line.startsWith("Total: $")) {
+                                parsedTotal = Double.parseDouble(line.substring("Total: $".length()).trim());
+                            }
+                            line = reader.readLine(); // Items (solo se lee la línea, no se parsean los ítems para objetos)
+
+                            // Saltar la línea "--- FIN CARRITO ---" y la línea en blanco
+                            reader.readLine(); // --- FIN CARRITO ---
+                            reader.readLine(); // línea en blanco
+
+                            Usuario dummyUsuario = null;
+                            if (!parsedUsuarioCedula.isEmpty() && !parsedUsuarioCedula.equals("N/A")) {
+                                dummyUsuario = new Usuario(parsedUsuarioCedula, "", null);
+                            } else {
+                                dummyUsuario = new Usuario("0000000000", "", null);
+                            }
+
+                            Carrito carrito = new Carrito(parsedCodigo, dummyUsuario);
                             carritos.add(carrito);
+                        } catch (NumberFormatException | IndexOutOfBoundsException | IOException | NullPointerException ex) { // Captura NPE aquí también
+                            System.err.println("Error al procesar bloque de carrito desde archivo de TEXTO. Se omitirá este carrito. Error: " + ex.getMessage());
+                            // Consumir las líneas restantes del bloque para no afectar el siguiente carrito
+                            while((line = reader.readLine()) != null && !line.trim().equals("--- FIN CARRITO ---")) { /* consumir líneas */ }
+                            reader.readLine(); // consumir la línea en blanco después de FIN CARRITO
                         }
-                    } catch (IOException | ClassNotFoundException e) {
-                        System.err.println("Error al listar carrito desde archivo BINARIO: " + file.getName() + " - " + e.getMessage());
-                        // Si hay un error al leer un archivo, simplemente lo omitimos y continuamos con los demás.
                     }
                 }
+            } catch (IOException e) {
+                System.err.println("Error al leer carritos desde archivo de TEXTO principal: " + e.getMessage());
             }
         }
         return carritos;
@@ -358,7 +413,7 @@ public class CarritoDAOArchivo implements CarritoDAO {
             return new ArrayList<>();
         }
         List<Carrito> carritosUsuario = new ArrayList<>();
-        for (Carrito carrito : listarTodos()) { // Reutilizamos listarTodos y luego filtramos
+        for (Carrito carrito : listarTodos()) {
             if (carrito != null && carrito.getUsuario() != null && carrito.getUsuario().getCedula() != null && carrito.getUsuario().getCedula().equals(usuario.getCedula())) {
                 carritosUsuario.add(carrito);
             }

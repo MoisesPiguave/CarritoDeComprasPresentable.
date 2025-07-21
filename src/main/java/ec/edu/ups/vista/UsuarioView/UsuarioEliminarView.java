@@ -55,7 +55,7 @@ public class UsuarioEliminarView extends JInternalFrame {
             }
         };
         tblUser.setModel(modelo);
-        cambiarIdioma();
+        cambiarIdioma(idioma);
         iconos();
     }
 
@@ -64,20 +64,20 @@ public class UsuarioEliminarView extends JInternalFrame {
      * gestionado por el {@link MensajeInternacionalizacionHandler}.
      * Esto incluye el título de la ventana, etiquetas, textos de botones y los encabezados de la tabla.
      */
-    public void cambiarIdioma() {
-        setTitle(idioma.get("usuario.eliminar.titulo"));
-        lblEliminar.setText(idioma.get("usuario.eliminar.tituloEtiqueta"));
-        BtnBuscar.setText(idioma.get("usuario.eliminar.boton.buscar"));
-        BtnEliminar.setText(idioma.get("usuario.eliminar.boton.eliminar"));
+    public void cambiarIdioma(MensajeInternacionalizacionHandler idioma) {
+        setTitle(this.idioma.get("usuario.eliminar.titulo"));
+        lblEliminar.setText(this.idioma.get("usuario.eliminar.tituloEtiqueta"));
+        BtnBuscar.setText(this.idioma.get("usuario.eliminar.boton.buscar"));
+        BtnEliminar.setText(this.idioma.get("usuario.eliminar.boton.eliminar"));
 
         modelo.setColumnIdentifiers(new Object[]{
-                idioma.get("usuario.eliminar.columna.nombre"),
-                idioma.get("usuario.eliminar.columna.usuario"),
-                idioma.get("usuario.eliminar.columna.contrasena"),
-                idioma.get("usuario.eliminar.columna.correo"),
-                idioma.get("usuario.eliminar.columna.celular"),
-                idioma.get("usuario.eliminar.columna.fechaNacimiento"),
-                idioma.get("usuario.eliminar.columna.rol")
+                this.idioma.get("usuario.eliminar.columna.nombre"),
+                this.idioma.get("usuario.eliminar.columna.usuario"),
+                this.idioma.get("usuario.eliminar.columna.contrasena"),
+                this.idioma.get("usuario.eliminar.columna.correo"),
+                this.idioma.get("usuario.eliminar.columna.celular"),
+                this.idioma.get("usuario.eliminar.columna.fechaNacimiento"),
+                this.idioma.get("usuario.eliminar.columna.rol")
         });
     }
 

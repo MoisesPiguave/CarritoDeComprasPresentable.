@@ -154,7 +154,7 @@ public class ProductoController {
     /**
      * Lista todos los productos disponibles y los carga en la vista de lista.
      */
-    private void listarProductos() {
+    public void listarProductos() {
         List<Producto> productos = productoDAO.listarTodos();
         productoListaView.cargarDatos(productos);
     }

@@ -2,7 +2,7 @@ package ec.edu.ups.vista.UsuarioView;
 
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.AdministradorView.LoginView;
+import ec.edu.ups.vista.AdministradorView.LoginView; // Este import parece un poco fuera de lugar para iconos
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -19,7 +19,7 @@ import java.net.URL;
  * @version 1.0
  * @since 17 de julio de 2025
  */
-public class UsuarioCrearView extends JInternalFrame {
+public class UsuarioCrearView extends JInternalFrame { // Correcto: extiende JInternalFrame
     private JPanel panelPrincipal;
     private JTextField TxtUsername;
     private JTextField TxtPassword;
@@ -54,12 +54,17 @@ public class UsuarioCrearView extends JInternalFrame {
     public UsuarioCrearView ( MensajeInternacionalizacionHandler idioma) {
         this.idioma = idioma;
         setContentPane(panelPrincipal);
-        setTitle("Crear Usuario"); // Este título se actualizará con el idioma en cambiarIdioma()
-        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        setTitle("Crear Usuario");
+        // Los siguientes son importantes para JInternalFrame
+        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE); // Disponer al cerrar
+        setClosable(true);     // Con botón de cerrar
+        setIconifiable(true);  // Con botón de minimizar
+        setResizable(true);    // Con posibilidad de cambiar tamaño
+        // setMaximizable(true); // Opcional: si quieres que se pueda maximizar
+
         setSize(500, 500);
-        setClosable(true);
-        setIconifiable(true);
-        setResizable(true);
+        pack(); // <--- AÑADIDO: Empaqueta la ventana para ajustar el tamaño a su contenido preferido
+        // Este método es útil para JInternalFrame también.
         iconos();
 
         BtnLimpiar.addActionListener(new ActionListener() {
@@ -68,17 +73,14 @@ public class UsuarioCrearView extends JInternalFrame {
                 limpiarCampos();
             }
         });
+
+        // Inicialización de ComboBoxes
         for (int i = 1; i <= 31; i++) cbxDia.addItem(i);
         for (int i = 1980; i <= 2025; i++) cbxAño.addItem(i);
-        String[] meses = {
-                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        };
-        // Se carga inicialmente con nombres de meses en español (o inglés por defecto)
-        // luego se actualiza con el idioma en cambiarIdioma()
-        for (String mes : meses) {
-            cbxMes.addItem(mes);
-        }
+
+        // Se llama a cambiarIdioma para cargar los meses y otros textos iniciales
+        // ya que el constructor de UsuarioCrearView es el único lugar donde se inicializan los comboboxes de fecha.
+        cambiarIdioma(idioma); // <-- Llamada para inicializar los textos y meses correctamente.
     }
 
     /**
@@ -87,22 +89,24 @@ public class UsuarioCrearView extends JInternalFrame {
      * Esto incluye el título de la ventana, etiquetas y textos de botones, así como las opciones
      * del ComboBox para los meses (obteniendo los nombres de los meses del archivo de propiedades).
      */
-    public void cambiarIdioma() {
-        setTitle(idioma.get("usuario.crear.titulo"));
-        lblNuevoUsuario.setText(idioma.get("usuario.crear.tituloEtiqueta"));
-        lblUsuario.setText(idioma.get("usuario.crear.usuario"));
-        lblContraseña.setText(idioma.get("usuario.crear.contrasena"));
-        lblRol.setText(idioma.get("usuario.crear.rol"));
-        lblCorreo.setText(idioma.get("usuario.crear.correo"));
-        lblCelular.setText(idioma.get("usuario.crear.celular"));
-        lblNombreC.setText(idioma.get("usuario.crear.nombreCompleto"));
-        lblFechaN.setText(idioma.get("usuario.crear.fechaNacimiento"));
-        BtnRegistrar.setText(idioma.get("usuario.crear.boton.registrar"));
-        BtnLimpiar.setText(idioma.get("usuario.crear.boton.limpiar"));
+    public void cambiarIdioma(MensajeInternacionalizacionHandler idioma) {
+        this.idioma = idioma; // Asegura que el idioma de la clase esté actualizado
+        setTitle(this.idioma.get("usuario.crear.titulo"));
+        lblNuevoUsuario.setText(this.idioma.get("usuario.crear.tituloEtiqueta"));
+        lblUsuario.setText(this.idioma.get("usuario.crear.usuario"));
+        lblContraseña.setText(this.idioma.get("usuario.crear.contrasena"));
+        lblRol.setText(this.idioma.get("usuario.crear.rol"));
+        lblCorreo.setText(this.idioma.get("usuario.crear.correo"));
+        lblCelular.setText(this.idioma.get("usuario.crear.celular"));
+        lblNombreC.setText(this.idioma.get("usuario.crear.nombreCompleto"));
+        lblFechaN.setText(this.idioma.get("usuario.crear.fechaNacimiento"));
+        BtnRegistrar.setText(this.idioma.get("usuario.crear.boton.registrar"));
+        BtnLimpiar.setText(this.idioma.get("usuario.crear.boton.limpiar"));
 
+        // Limpiar y cargar meses en el idioma correcto
         cbxMes.removeAllItems();
         for (int i = 1; i <= 12; i++) {
-            cbxMes.addItem(idioma.get("mess." + i)); // Usa claves como "mess.1", "mess.2" para los meses
+            cbxMes.addItem(this.idioma.get("mess." + i)); // Usa claves como "mess.1", "mess.2" para los meses
         }
     }
 
@@ -464,19 +468,22 @@ public class UsuarioCrearView extends JInternalFrame {
      * Si un icono no se encuentra, imprime un mensaje de error en la consola estándar.
      */
     public void iconos() {
-        URL botonLimpiar = LoginView.class.getClassLoader().getResource("imagenes/LimpiarTodo.svg.png");
+        // La referencia a LoginView.class.getClassLoader() podría ser frágil si LoginView no existe
+        // o si los recursos están en un lugar diferente para esta vista.
+        // Es más robusto usar UsuarioCrearView.class.getClassLoader()
+        URL botonLimpiar = UsuarioCrearView.class.getClassLoader().getResource("imagenes/LimpiarTodo.svg.png");
         if (botonLimpiar != null) {
             ImageIcon icono = new ImageIcon(botonLimpiar);
             BtnLimpiar.setIcon(icono);
         } else {
-            System.err.println("Icono no encontrado");
+            System.err.println("Icono no encontrado: imagenes/LimpiarTodo.svg.png para UsuarioCrearView");
         }
-        URL botonRegistrar = LoginView.class.getClassLoader().getResource("imagenes/Register.svg.png");
+        URL botonRegistrar = UsuarioCrearView.class.getClassLoader().getResource("imagenes/Register.svg.png");
         if (botonRegistrar != null) {
             ImageIcon icono = new ImageIcon(botonRegistrar);
             BtnRegistrar.setIcon(icono);
         } else {
-            System.err.println("Icono no encontrado");
+            System.err.println("Icono no encontrado: imagenes/Register.svg.png para UsuarioCrearView");
         }
     }
 }

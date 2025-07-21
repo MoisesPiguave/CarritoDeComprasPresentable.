@@ -4,10 +4,10 @@ import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.modelo.Producto;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets; // A pesar de no usar java.nio.file.Files, StandardCharsets sigue siendo útil para especificar la codificación.
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale; // Necesario para String.format de double
+import java.util.Locale;
 
 /**
  * Implementación de {@link ProductoDAO} que gestiona la persistencia de objetos {@link Producto}
@@ -16,7 +16,9 @@ import java.util.Locale; // Necesario para String.format de double
  * <li>Archivo binario (.dat): para el objeto completo serializado.</li>
  * <li>Archivo de texto (.txt): para metadatos clave como código, nombre y precio, con longitud fija.</li>
  * </ul>
- * Esta versión utiliza operaciones básicas de {@code java.io} y bucles tradicionales,
+ * Esta versión ha sido modificada para almacenar **todos los productos en un único archivo binario**
+ * y **un único archivo de texto**, sobrescribiendo el contenido completo en cada operación de guardado.
+ * Utiliza operaciones básicas de {@code java.io} y bucles tradicionales,
  * evitando las APIs de {@code java.nio} y {@code java.util.stream}, para mantener el código más directo.
  * Al inicializar, verifica si hay productos existentes y precarga uno si el almacenamiento está vacío.
  *
@@ -27,6 +29,10 @@ import java.util.Locale; // Necesario para String.format de double
 public class ProductoDAOArchivo implements ProductoDAO {
 
     private final String storageDirectoryPath;
+
+    // --- NUEVAS RUTAS DE ARCHIVO GLOBALES para el almacenamiento único de TODOS los productos ---
+    private final String ALL_PRODUCTS_BINARY_FILE_PATH;
+    private final String ALL_PRODUCTS_TEXT_FILE_PATH;
 
     // --- Definición de longitudes fijas para el archivo de texto ---
     private static final int CODIGO_LENGTH = 5; // Para códigos como "1", "12345"
@@ -43,41 +49,36 @@ public class ProductoDAOArchivo implements ProductoDAO {
      * @param directoryPath La ruta base del directorio donde se almacenarán los archivos de productos.
      */
     public ProductoDAOArchivo(String directoryPath) {
-        // Concatenamos para crear la ruta específica para productos, usando File.separator para compatibilidad.
         this.storageDirectoryPath = directoryPath + File.separator + "productos";
         File directory = new File(this.storageDirectoryPath);
         if (!directory.exists()) {
-            if (!directory.mkdirs()) { // Crea el directorio si no existe. Devuelve false si falla.
+            if (!directory.mkdirs()) {
                 System.err.println("Error al crear el directorio de almacenamiento de productos: " + storageDirectoryPath);
             }
         }
+
+        // --- Inicializar las rutas de archivo globales ---
+        this.ALL_PRODUCTS_BINARY_FILE_PATH = this.storageDirectoryPath + File.separator + "all_products.dat";
+        this.ALL_PRODUCTS_TEXT_FILE_PATH = this.storageDirectoryPath + File.separator + "all_products.txt";
+
         // Puedes precargar un producto inicial aquí si lo deseas, como en ProductoDAOMemoria
+        // Ahora usarás listarTodos() que lee del archivo único.
         if (listarTodos().isEmpty()) {
             crear(new Producto(1, "Balon Molten 7", 30));
         }
     }
 
-    /**
-     * Construye el objeto {@link File} para el archivo binario de un producto dado su código.
-     * El archivo binario guarda el objeto {@link Producto} completo serializado.
-     *
-     * @param codigo El código del producto.
-     * @return El objeto {@link File} que representa el archivo binario (.dat) del producto.
-     */
+    // Los métodos 'getBinaryFile(int codigo)' y 'getTextFile(int codigo)' ya no son necesarios
+    // porque ahora hay un solo archivo para todos los productos.
+    /*
     private File getBinaryFile(int codigo) {
         return new File(storageDirectoryPath + File.separator + codigo + ".dat");
     }
 
-    /**
-     * Construye el objeto {@link File} para el archivo de texto de un producto dado su código.
-     * El archivo de texto guarda metadatos en un formato de longitud fija.
-     *
-     * @param codigo El código del producto.
-     * @return El objeto {@link File} que representa el archivo de texto (.txt) del producto.
-     */
     private File getTextFile(int codigo) {
         return new File(storageDirectoryPath + File.separator + codigo + ".txt");
     }
+    */
 
     /**
      * Formatea una cadena de texto para que tenga una longitud fija.
@@ -93,15 +94,50 @@ public class ProductoDAOArchivo implements ProductoDAO {
             text = "";
         }
         if (text.length() > length) {
-            return text.substring(0, length); // Trunca si es demasiado largo
+            return text.substring(0, length);
         }
-        return String.format("%-" + length + "s", text); // Rellena con espacios a la derecha
+        return String.format("%-" + length + "s", text);
+    }
+
+    // --- NUEVO MÉTODO AUXILIAR: Guarda toda la lista de productos ---
+    /**
+     * Guarda la lista completa de productos en el archivo binario y en el archivo de texto.
+     * Este método sobrescribe el contenido anterior de ambos archivos.
+     *
+     * @param productos La lista de {@link Producto} a guardar.
+     */
+    private void saveAllProducts(List<Producto> productos) {
+        // 1. Guardar en archivo BINARIO
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ALL_PRODUCTS_BINARY_FILE_PATH))) {
+            oos.writeObject(productos); // Escribe la lista completa de objetos Producto
+            System.out.println("Todos los productos guardados en archivo BINARIO: " + ALL_PRODUCTS_BINARY_FILE_PATH);
+        } catch (IOException e) {
+            System.err.println("Error al guardar TODOS los productos en archivo BINARIO: " + e.getMessage());
+        }
+
+        // 2. Guardar en archivo de TEXTO (formato de longitud fija, cada producto en una línea)
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ALL_PRODUCTS_TEXT_FILE_PATH), StandardCharsets.UTF_8))) {
+            for (Producto producto : productos) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(fixedLengthString(String.valueOf(producto.getCodigo()), CODIGO_LENGTH));
+                sb.append(fixedLengthString(producto.getNombre(), NOMBRE_LENGTH));
+
+                String precioAsString = String.format(Locale.US, "%.2f", producto.getPrecio());
+                sb.append(fixedLengthString(precioAsString, PRECIO_LENGTH));
+
+                writer.write(sb.toString());
+                writer.newLine(); // Cada producto en una nueva línea
+            }
+            System.out.println("Todos los productos guardados en archivo de TEXTO: " + ALL_PRODUCTS_TEXT_FILE_PATH);
+        } catch (IOException e) {
+            System.err.println("Error al guardar TODOS los productos en archivo de TEXTO: " + e.getMessage());
+        }
     }
 
     /**
      * Crea y persiste un nuevo producto en el sistema de archivos.
-     * El producto se guarda en un archivo binario (serializado) y en un archivo de texto
-     * con formato de longitud fija para sus atributos clave.
+     * El producto se añade a la colección existente y se guarda la lista completa
+     * en un único archivo binario (serializado) y un único archivo de texto.
      *
      * @param producto El objeto {@link Producto} a ser creado y persistido.
      * @throws IllegalArgumentException Si el producto proporcionado es nulo.
@@ -112,75 +148,51 @@ public class ProductoDAOArchivo implements ProductoDAO {
             throw new IllegalArgumentException("El producto no puede ser nulo para la creación.");
         }
 
-        File binaryFile = getBinaryFile(producto.getCodigo());
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binaryFile))) {
-            oos.writeObject(producto);
-            System.out.println("Producto creado y guardado BINARIO, codigo: " + producto.getCodigo());
-        } catch (IOException e) {
-            System.err.println("Error al guardar producto en archivo BINARIO: " + e.getMessage());
+        // Paso 1: Leer todos los productos existentes
+        List<Producto> productos = listarTodos();
+
+        // Paso 2: Verificar si el producto ya existe por código
+        boolean existe = productos.stream().anyMatch(p -> p.getCodigo() == producto.getCodigo());
+        if (existe) {
+            System.err.println("Error: El producto con código " + producto.getCodigo() + " ya existe. No se creará.");
+            return;
         }
 
-        File textFile = getTextFile(producto.getCodigo());
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(textFile), StandardCharsets.UTF_8))) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(fixedLengthString(String.valueOf(producto.getCodigo()), CODIGO_LENGTH));
-            sb.append(fixedLengthString(producto.getNombre(), NOMBRE_LENGTH));
+        // Paso 3: Añadir el nuevo producto a la lista
+        productos.add(producto);
+        System.out.println("Producto añadido a la colección en memoria: " + producto.getCodigo());
 
-            // Formatea el precio a 2 decimales y luego lo ajusta a la longitud fija
-            String precioAsString = String.format(Locale.US, "%.2f", producto.getPrecio());
-            sb.append(fixedLengthString(precioAsString, PRECIO_LENGTH));
-
-            writer.write(sb.toString());
-            System.out.println("Producto creado y guardado TEXTO, codigo: " + producto.getCodigo());
-        } catch (IOException e) {
-            System.err.println("Error al guardar producto en archivo de TEXTO: " + e.getMessage());
-        }
+        // Paso 4: Guardar la lista completa de productos en los archivos
+        saveAllProducts(productos);
     }
 
     /**
-     * Busca y recupera un producto por su código.
-     * Prioriza la lectura del archivo binario. Si este no existe o hay un error de lectura,
-     * intenta leer el producto desde su representación en archivo de texto plano como fallback.
+     * Busca y recupera un producto por su código de la colección completa de productos.
      *
      * @param codigo El código entero del producto a buscar.
-     * @return El objeto {@link Producto} si se encuentra, o {@code null} si no existe un producto con ese código
-     * o si ocurre un error durante la lectura en ambos formatos.
+     * @return El objeto {@link Producto} si se encuentra, o {@code null} si no existe un producto con ese código.
      */
     @Override
     public Producto buscarPorCodigo(int codigo) {
         if (codigo <= 0) {
             return null;
         }
-
-        File binaryFile = getBinaryFile(codigo);
-        if (binaryFile.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(binaryFile))) {
-                return (Producto) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Error al leer producto de archivo BINARIO para código " + codigo + ", intentando archivo de texto: " + e.getMessage());
-                // Si falla la lectura binaria, intenta leer del archivo de texto
-                return readProductoFromTextFile(codigo);
-            }
-        } else {
-            // Si el binario no existe, intentar leer del archivo de texto
-            return readProductoFromTextFile(codigo);
-        }
+        // Buscar en la lista completa de productos cargada desde los archivos.
+        return listarTodos().stream()
+                .filter(p -> p.getCodigo() == codigo)
+                .findFirst()
+                .orElse(null);
     }
 
-    /**
-     * Método auxiliar para reconstruir un objeto {@link Producto} a partir de su representación
-     * en un archivo de texto plano con formato de longitud fija.
-     *
-     * @param codigo El código del producto a leer.
-     * @return El objeto {@link Producto} reconstruido, o {@code null} si falla la lectura o el parseo.
-     */
+    // El método 'readProductoFromTextFile(int codigo)' ya no es necesario como fallback individual
+    // porque la lógica de lectura ahora está centralizada en listarTodos() y readAllProductsFromTextFile().
+    /*
     private Producto readProductoFromTextFile(int codigo) {
         File textFile = getTextFile(codigo);
         if (textFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(textFile), StandardCharsets.UTF_8))) {
                 String line = reader.readLine();
                 if (line != null && line.length() >= TOTAL_TEXT_RECORD_LENGTH) {
-                    // Parsear los campos de la línea de longitud fija
                     String parsedCodigoStr = line.substring(0, CODIGO_LENGTH).trim();
                     String parsedNombre = line.substring(CODIGO_LENGTH, CODIGO_LENGTH + NOMBRE_LENGTH).trim();
                     String parsedPrecioStr = line.substring(CODIGO_LENGTH + NOMBRE_LENGTH, TOTAL_TEXT_RECORD_LENGTH).trim();
@@ -196,6 +208,7 @@ public class ProductoDAOArchivo implements ProductoDAO {
         }
         return null;
     }
+    */
 
     /**
      * Busca productos por su nombre (o una parte inicial de él) en la lista de todos los productos.
@@ -212,7 +225,7 @@ public class ProductoDAOArchivo implements ProductoDAO {
             return productosEncontrados;
         }
         // Se itera sobre todos los productos y se filtra por nombre, sin usar Streams
-        for (Producto producto : listarTodos()) {
+        for (Producto producto : listarTodos()) { // Ahora listarTodos() lee del archivo único
             if (producto != null && producto.getNombre() != null && producto.getNombre().toLowerCase().startsWith(nombre.toLowerCase())) {
                 productosEncontrados.add(producto);
             }
@@ -222,8 +235,8 @@ public class ProductoDAOArchivo implements ProductoDAO {
 
     /**
      * Actualiza un producto existente en el sistema de archivos.
-     * La operación de actualización se implementa eliminando las versiones anteriores del producto
-     * (binaria y de texto) y luego creando nuevas con los datos actualizados.
+     * La operación implica cargar todos los productos, encontrar y reemplazar el producto a actualizar,
+     * y luego volver a guardar la lista completa en los archivos.
      *
      * @param producto El objeto {@link Producto} con los datos actualizados.
      * @throws IllegalArgumentException Si el producto proporcionado es nulo.
@@ -233,76 +246,124 @@ public class ProductoDAOArchivo implements ProductoDAO {
         if (producto == null) {
             throw new IllegalArgumentException("El producto no puede ser nulo para la actualización.");
         }
-        eliminar(producto.getCodigo()); // Elimina los archivos existentes (binario y texto)
-        crear(producto); // Crea nuevos archivos con la información actualizada
+
+        // Paso 1: Cargar todos los productos existentes
+        List<Producto> productos = listarTodos();
+        boolean encontrado = false;
+
+        // Paso 2: Iterar y actualizar el producto si existe
+        for (int i = 0; i < productos.size(); i++) {
+            if (productos.get(i).getCodigo() == producto.getCodigo()) {
+                productos.set(i, producto); // Reemplaza el producto en la lista
+                encontrado = true;
+                System.out.println("Producto actualizado en la colección en memoria: " + producto.getCodigo());
+                break;
+            }
+        }
+
+        if (!encontrado) {
+            System.err.println("Error: El producto con código " + producto.getCodigo() + " no fue encontrado para actualizar.");
+            return;
+        }
+
+        // Paso 3: Guardar la lista completa de productos actualizada
+        saveAllProducts(productos);
     }
 
     /**
-     * Elimina un producto del sistema de archivos, removiendo tanto su archivo binario como de texto.
+     * Elimina un producto del sistema de archivos, removiendo su entrada de la colección completa.
+     * La operación implica cargar todos los productos, eliminar el producto especificado,
+     * y luego volver a guardar la lista reducida en los archivos.
      *
      * @param codigo El código entero del producto a eliminar.
      */
     @Override
     public void eliminar(int codigo) {
-        File binaryFile = getBinaryFile(codigo);
-        File textFile = getTextFile(codigo);
+        // Paso 1: Cargar todos los productos existentes
+        List<Producto> productos = listarTodos();
 
-        boolean binaryDeleted = false;
-        boolean textDeleted = false;
+        // Paso 2: Eliminar el producto de la lista
+        boolean removido = productos.removeIf(p -> p.getCodigo() == codigo);
 
-        if (binaryFile.exists()) {
-            binaryDeleted = binaryFile.delete();
-            if (!binaryDeleted) {
-                System.err.println("Error al eliminar el archivo BINARIO del producto con código " + codigo);
-            }
+        if (removido) {
+            System.out.println("Producto eliminado de la colección en memoria: " + codigo);
+            // Paso 3: Guardar la lista completa de productos actualizada (sin el eliminado)
+            saveAllProducts(productos);
         } else {
-            binaryDeleted = true; // Si no existe, se considera "eliminado"
-        }
-
-        if (textFile.exists()) {
-            textDeleted = textFile.delete();
-            if (!textDeleted) {
-                System.err.println("Error al eliminar el archivo de TEXTO del producto con código " + codigo);
-            }
-        } else {
-            textDeleted = true; // Si no existe, se considera "eliminado"
-        }
-
-        if (binaryDeleted && textDeleted) {
-            System.out.println("Producto eliminado (binario y texto), codigo: " + codigo);
-        } else {
-            System.err.println("Advertencia: No se pudieron eliminar todos los archivos del producto con código " + codigo);
+            System.err.println("Error: El producto con código " + codigo + " no fue encontrado para eliminar.");
         }
     }
 
     /**
      * Lista todos los productos persistidos en el sistema de archivos.
-     * Prioriza la lectura de los archivos binarios (.dat) para reconstruir los objetos {@link Producto} completos.
-     * Si un archivo binario no se puede leer, se imprime un error y ese producto no se incluye en la lista.
+     * Lee la lista completa de productos del único archivo binario (.dat)
+     * y la deserializa. Si el archivo binario no existe o hay un error de lectura,
+     * intenta reconstruir la lista desde el archivo de texto.
      *
      * @return Una {@link List} que contiene todos los objetos {@link Producto} encontrados.
-     * Retorna una lista vacía si no hay productos o si ocurren errores de lectura.
+     * Retorna una lista vacía si no hay productos o si ocurren errores de lectura en ambos formatos.
      */
     @Override
     public List<Producto> listarTodos() {
         List<Producto> productos = new ArrayList<>();
-        File directory = new File(storageDirectoryPath);
-        File[] files = directory.listFiles(); // Lista todos los archivos en el directorio
+        File binaryFile = new File(ALL_PRODUCTS_BINARY_FILE_PATH);
 
-        if (files != null) {
-            for (File file : files) {
-                // Solo consideramos los archivos binarios para listar, ya que son los que tienen el objeto completo.
-                if (file.isFile() && file.getName().endsWith(".dat")) {
-                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                        Producto producto = (Producto) ois.readObject();
-                        if (producto != null) {
-                            productos.add(producto);
-                        }
-                    } catch (IOException | ClassNotFoundException e) {
-                        System.err.println("Error al listar producto desde archivo BINARIO: " + file.getName() + " - " + e.getMessage());
-                        // Si hay un error al leer un archivo, simplemente lo omitimos y continuamos con los demás.
+        // Intentar leer del archivo binario principal
+        if (binaryFile.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(binaryFile))) {
+                Object obj = ois.readObject();
+                if (obj instanceof List) {
+                    productos.addAll((List<Producto>) obj);
+                } else {
+                    System.err.println("El contenido del archivo binario no es una lista de productos. Intentando leer del archivo de texto.");
+                    // Si el archivo binario no contiene una lista, intenta leer del texto como fallback.
+                    productos = readAllProductsFromTextFile();
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("Error al leer la lista de productos del archivo BINARIO principal: " + e.getMessage());
+                System.out.println("Intentando reconstruir la lista desde el archivo de texto principal...");
+                // Si falla la lectura binaria, intentar leer del archivo de texto
+                productos = readAllProductsFromTextFile();
+            }
+        } else {
+            System.out.println("Archivo binario de productos principal no encontrado. Intentando leer del archivo de texto principal...");
+            // Si el binario no existe, intentar leer del archivo de texto
+            productos = readAllProductsFromTextFile();
+        }
+        return productos;
+    }
+
+    // --- NUEVO MÉTODO AUXILIAR PARA LEER LA LISTA COMPLETA DE PRODUCTOS DESDE EL ARCHIVO DE TEXTO ---
+    /**
+     * Método auxiliar para reconstruir una lista de objetos {@link Producto} a partir de su representación
+     * en un único archivo de texto plano con formato de longitud fija, una línea por producto.
+     *
+     * @return La {@link List} de objetos {@link Producto} reconstruidos con los datos disponibles en el archivo de texto,
+     * o una lista vacía si falla la lectura o el parseo.
+     */
+    private List<Producto> readAllProductsFromTextFile() {
+        List<Producto> productos = new ArrayList<>();
+        File textFile = new File(ALL_PRODUCTS_TEXT_FILE_PATH);
+        if (textFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(textFile), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.length() >= TOTAL_TEXT_RECORD_LENGTH) {
+                        // Parsear los campos de la línea de longitud fija
+                        String parsedCodigoStr = line.substring(0, CODIGO_LENGTH).trim();
+                        String parsedNombre = line.substring(CODIGO_LENGTH, CODIGO_LENGTH + NOMBRE_LENGTH).trim();
+                        String parsedPrecioStr = line.substring(CODIGO_LENGTH + NOMBRE_LENGTH, TOTAL_TEXT_RECORD_LENGTH).trim();
+
+                        int parsedCodigo = Integer.parseInt(parsedCodigoStr);
+                        double parsedPrecio = Double.parseDouble(parsedPrecioStr);
+
+                        productos.add(new Producto(parsedCodigo, parsedNombre, parsedPrecio));
+                    } else {
+                        System.err.println("Línea de texto de producto incompleta o corrupta: " + line);
                     }
                 }
+            } catch (IOException | NumberFormatException | IndexOutOfBoundsException e) {
+                System.err.println("Error al leer o parsear productos de archivo de TEXTO principal: " + e.getMessage());
             }
         }
         return productos;
