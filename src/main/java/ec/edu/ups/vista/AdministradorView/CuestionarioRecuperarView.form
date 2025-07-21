@@ -40,7 +40,7 @@
             <properties>
               <font name="Monospaced" size="26"/>
               <foreground color="-16774110"/>
-              <text value="Usuario"/>
+              <text value="Cedula"/>
             </properties>
           </component>
           <component id="440c2" class="javax.swing.JTextField" binding="txtUsuario">
